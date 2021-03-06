@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 class FlatActionButtonWidget extends StatelessWidget {
   final onPressed;
   final tooltip;
+  final icon;
 
-  const FlatActionButtonWidget({Key key, this.onPressed, this.tooltip}) : super(key: key);
+  const FlatActionButtonWidget({Key key, this.onPressed, this.tooltip, this.icon}) : super(key: key);
 
 
 
@@ -15,8 +16,10 @@ class FlatActionButtonWidget extends StatelessWidget {
       backgroundColor: Color(0xffe9a14e),
       onPressed: onPressed,
       tooltip: tooltip,
+
       child: Icon(
-        Icons.add,
+        icon,
+       // Icons.add,
         color: Colors.white,
       ),
     );

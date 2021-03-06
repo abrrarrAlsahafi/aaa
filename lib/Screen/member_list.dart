@@ -4,6 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'chat/chat_list.dart';
+
 class MembersList extends StatefulWidget {
   List member;
   var admin;
@@ -27,8 +29,8 @@ class _MembersListState extends State<MembersList> {
       items = List.generate(
           widget.member.length,
           (i) => MessageItem(
-                widget.member[i].name,
-                widget.member[i].image,
+                widget.member[i],
+               // widget.member[i],
                 widget.admin == null
                     ? false
                     : widget.admin == widget.member[i].id,
@@ -39,55 +41,33 @@ class _MembersListState extends State<MembersList> {
   @override
   Widget build(BuildContext context) {
     final title = 'Members';
-
     return Expanded(
       child: Container(
-        // backgroundColor: const Color(0xfff3f6fc),
-        height: 100.0 * items.length,
-        child: // Container(
-            /* backgroundColor: const Color(0xfff3f6fc),
-          appBar: AppBar(
-            backgroundColor: const Color(0xff336699),
-            automaticallyImplyLeading: true,
-            title: Text(title),
-          ),*/
-            // child
-            ListView.builder(
-          // Let the ListView know how many items it needs to build.
-          itemCount: items.length,
-          // Provide a builder function. This is where the magic happens.
-          // Convert each item into a widget based on the type of item it is.
-          itemBuilder: (context, index) {
-            final item = items[index];
-            //print(length);
-
-            return ListTile(
-              leading: item.buildLeading(context, index),
-              title: item.buildTitle(context, index),
-              subtitle: item.buildSubtitle(context),
-              /*   trailing: InkWell(
-                onTap: () => Navigator.of(context)
-                    .pushReplacement(MaterialPageRoute(
-                        builder: (context) => MyDirectChatDetailPage(
-                              newChat: true,
-                              member: [],
-                              //mid: widget.items[index].,
-                              isPrivetGroup: false,
-                              ischatGroup: false,
-                            )))
-                    .then((value) {
-                  setState(() {});
-                }),
-                 child: Icon(
-                  Icons.chat,
-                  color: Colors.orange,
+                // backgroundColor: const Color(0xfff3f6fc),
+                height: 200.0 * items.length,
+                child: ListView.separated(
+                  separatorBuilder: (context, index) => Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12),
+                    child: Divider(
+                      color: Colors.black12,
+                    ),
+                  ),
+                  // Let the ListView know how many items it needs to build.
+                  itemCount: items.length,
+                  // Provide a builder function. This is where the magic happens.
+                  // Convert each item into a widget based on the type of item it is.
+                  itemBuilder: (context, index) {
+                      final item = items[index];
+                      return ListTile(
+                        dense: true,
+                        leading: item.buildLeading(context, index),
+                        title: item.buildTitle(context, index),
+                        subtitle: item.buildSubtitle(context),
+                      );
+                  },
                 ),
-              ),*/
-            );
-          },
-        ),
-        // ),
-      ),
+              ),
+
     );
   }
 }
@@ -106,32 +86,24 @@ abstract class ListItem {
 /// A ListItem that contains data to display a message.
 class MessageItem implements ListItem {
   final sender;
-  final body;
+  //final body;
   final isFolowing;
 
-  List<String> members = [
-    'Ali Ahmed',
-    'Nora Sliman',
-    'Sali Ali',
-    'Dr.Shaya',
-    'Aljazi Omer',
-    'Adam Family',
-    'Lili Karim'
-  ];
-  MessageItem(this.sender, this.body, this.isFolowing);
+  MessageItem(this.sender,// this.body,
+      this.isFolowing);
 
   Widget buildLeading(BuildContext context, int index) => ClipRRect(
       borderRadius: BorderRadius.circular(50.0),
       child: MembertImage(
-        index: index,
-        image: body,
+       // index: index,
+        item: sender,
       )
       // : Container(),
       );
 
   Widget buildTitle(BuildContext context, int index) => Text(
         // isFolowing ?
-        sender, //: members[index],
+        sender.name, //: members[index],
         style: TextStyle(),
       );
 

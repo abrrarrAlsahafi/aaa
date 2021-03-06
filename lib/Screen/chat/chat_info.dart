@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:management_app/common/constant.dart';
 import 'package:management_app/model/folowing.dart';
 import 'package:management_app/widget/bulid_memberimage.dart';
+import 'package:management_app/widget/flat_action_botton_wedget.dart';
 import 'package:provider/provider.dart';
 
 import '../member_list.dart';
@@ -25,15 +26,12 @@ class _ChatInfoState extends State<ChatInfo> {
   Folowing admin = Folowing();
   @override
   void initState() {
-    //print("sender ... ${widget.sender.isChat}");
     super.initState();
     if (widget.channalId == null) {
       print("is chat ${widget.sender.isChat}");
     } else {
       buildItem(context);
     }
-    // Chat chat=widget.sender;
-    // print(chat.isChat);
   }
 
   @override
@@ -61,7 +59,7 @@ class _ChatInfoState extends State<ChatInfo> {
                     )),
                 Expanded(
                     child: SizedBox(
-                  height: 22,
+                  height: 12,
                 )),
                 Container(
                   height: 100,
@@ -69,7 +67,7 @@ class _ChatInfoState extends State<ChatInfo> {
                   //borderRadius: BorderRadius.circular(33.0),
                   child: ClipRRect(
                       borderRadius: BorderRadius.circular(50.0),
-                      child: MembertImage(image: widget.sender.image)),
+                      child: MembertImage(item: widget.sender)),
                 ),
                 SizedBox(height: 12),
                 // Image.memory()
@@ -88,11 +86,14 @@ class _ChatInfoState extends State<ChatInfo> {
               : MembersList(member: members, admin: widget.sender.adminId)
         ],
       ),
+      floatingActionButton: FlatActionButtonWidget(
+            onPressed: (){},
+            icon: Icons.person_add_alt_1_outlined
+      ),
     );
   }
 
   buildItem(context) {
-   // print('uytrewerfghjklkjhgfdsasdfghjkl');
     var memberss =
         widget.sender.members != null ? widget.sender.members : widget.sender;
 

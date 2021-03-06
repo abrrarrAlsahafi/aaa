@@ -2,17 +2,11 @@ import 'dart:core';
 
 import 'package:management_app/common/constant.dart';
 import 'package:management_app/model/massege.dart';
-import 'package:management_app/model/user.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
-
-import '../../bottom_bar.dart';
-
-//import '../../common/messages.dart';
 
 class MyMessageChatTile extends StatelessWidget {
-  final double minValue = 10.0;
+  final double minValue = 6.0;
   final sender;
   final Massege message;
   final currentUser;
@@ -32,10 +26,6 @@ class MyMessageChatTile extends StatelessWidget {
       this.datesend, this.isChat});
   @override
   Widget build(BuildContext context) {
-    final cap =
-        Theme.of(context).textTheme.subhead.apply(color: Colors.black87);
-    final tit = Theme.of(context).textTheme.caption.apply(color: Colors.white54);
-
     return Align(
           alignment: (isCurrentUser?Alignment.topRight:Alignment.topLeft),
           child: Container(
@@ -49,25 +39,32 @@ class MyMessageChatTile extends StatelessWidget {
               ],
               borderRadius: isCurrentUser
             ? BorderRadius.only(
-                topRight:Radius.zero ,
+              //  topRight:Radius.circular(-10) ,
             topLeft: Radius.circular(minValue * 2),
             bottomLeft: Radius.circular(minValue * 2),
             bottomRight: Radius.circular(minValue * 2),
           )
                 : BorderRadius.only(
-        bottomRight: Radius.circular(minValue * 2),
+                  bottomRight: Radius.circular(minValue * 2),
           bottomLeft: Radius.circular(minValue * 2),
           topRight: Radius.circular(minValue * 2)),
         color: isCurrentUser ? hexToColor('#E1E8F5') : Colors.white,
             ),
             padding: EdgeInsets.all(6),
             child: Stack(children:[
-            Padding(padding: EdgeInsets.all(10),
+               Padding(padding: EdgeInsets.only(top: 14, bottom: 4, right: 10, left: 10),
                 child: Text.rich(builder())),
-              Positioned(child: Text('${DateFormat.jm().format(datesend).toString()}',
-                  style: TextStyle(
-                      fontSize: 9, color: Colors.grey),
-              ), right: 6.0,
+             isChat || isCurrentUser? SizedBox():
+             Positioned(child: Text('${msender.toString().trim()}',
+                style: TextStyle(
+                    fontSize: 10, color: Colors.grey),
+              ), left:isCurrentUser? 55.0: 0.0,
+                top:0.0,
+                right: 6.0,
+              ),Positioned(child: MDate(dateToCheck:datesend
+                  //'${DateFormat.jm().format(datesend).toString()}'
+                 ),//top: 0.0,
+                right: 6.0,
                 bottom: 0.0,
               )
             ]),
@@ -78,12 +75,43 @@ class MyMessageChatTile extends StatelessWidget {
 
   TextSpan builder(){
     return TextSpan(
-        style: TextStyle(fontSize: 15),
-      children: [
-        isChat?TextSpan(text:''):TextSpan(text:"${msender.toString().trim()}\n"),
-        TextSpan(text:"${message.text.toString().trim()}\n"),
-      ]
-    );
+          style: TextStyle(fontSize: 15),
+          text:"${message.text.toString().trim()}      ");
 
   }
+}
+class MDate extends StatelessWidget {
+  final dateToCheck;
+
+  MDate({Key key,this.dateToCheck }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final DateTime now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = DateTime(now.year, now.month, now.day - 1);
+    final daybefor = DateTime(now.year, now.month, now.day - 2);
+    final aDate = DateTime(dateToCheck.year, dateToCheck.month, dateToCheck.day);
+    if(aDate == today) {
+    //  print("$aDate  $today");
+      return Text('${DateFormat.jm().format(aDate).toString()}', style: TextStyle(
+          fontSize: 7, color: Colors.grey));
+    } else if(aDate == yesterday ) {
+     // print("$yesterday");
+      return Text("yesterday",style: TextStyle(
+          fontSize: 7, color: Colors.grey), );
+  } else if(aDate == daybefor ) {
+  // print("$yesterday");
+  return Text("${DateFormat('EEEE').format(aDate).toString()}",style: TextStyle(
+  fontSize: 7, color: Colors.grey), );
+  }else {
+      return Text("${DateFormat('yMd').format(aDate).toString()}",style:
+        TextStyle(
+          fontSize: 7, color: Colors.grey));
+    }
+
+  }
+
+
+
 }

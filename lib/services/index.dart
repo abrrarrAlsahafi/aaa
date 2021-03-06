@@ -1,4 +1,5 @@
 import 'package:management_app/model/folowing.dart';
+import 'package:management_app/model/massege.dart';
 import 'package:management_app/model/task.dart';
 import 'package:management_app/model/user.dart';
 
@@ -14,9 +15,12 @@ abstract class BaseServices {
   });
 
   Future<dynamic> login({username, password});
+  Future<dynamic> sginOut({username, password});
+
   Future<dynamic> chatHistory();
   Future<List<Folowing>> getfollowingList();
-  Future<List<Task>> getUserTask();
+  Future<List<Task>> getUserTask(id);
+  Future<NewMessages> newMasseges();
 }
 
 class Services implements BaseServices {
@@ -56,13 +60,25 @@ class Services implements BaseServices {
   }
 
   @override
-  Future<List<Task>> getUserTask() {
-    throw serviceApi.getUserTask();
+  Future<List<Task>> getUserTask(id) {
+    throw serviceApi.getUserTask(id);
   }
 
   @override
   Future<List<Folowing>> getfollowingList() {
     // TODO: implement getfollowingList
     throw serviceApi.getfollowingList();
+  }
+
+  @override
+  Future<NewMessages> newMasseges() {
+    // TODO: implement newMasseges
+    throw serviceApi.newMasseges();
+  }
+
+  @override
+  Future sginOut({username, password}) {
+    // TODO: implement sginOut
+    throw serviceApi.sginOut();
   }
 }

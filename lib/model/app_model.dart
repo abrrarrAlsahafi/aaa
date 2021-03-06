@@ -1,8 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:management_app/generated/I10n.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../common/constant.dart';
+import 'channal.dart';
+import 'folowing.dart';
+import 'massege.dart';
 
 const String LAGUAGE_CODE = 'language_code';
 
@@ -48,6 +52,14 @@ class AppModel extends ChangeNotifier {
     getConfig();
   }
 
+  config(context) async {
+    await Provider.of<ChatModel>(context, listen: false)
+        .getChannalsHistory();
+
+    await Provider.of<FollowingModel>(context, listen: false)
+        .getfollowingList();
+    await Provider.of<MassegesContent>(context, listen: false).gitAllMessagees(context);
+  }
   Future<bool> getConfig() async {
     // print('appLocal c $appLocal');
 

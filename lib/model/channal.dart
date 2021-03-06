@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:management_app/model/massege.dart';
 import 'package:management_app/services/emom_api.dart';
 import 'package:provider/provider.dart';
 
@@ -16,6 +18,7 @@ class Chat {
   List members;
   int adminId;
   bool isChat;
+  List<Massege> massegContex;
 
   Chat(
       {this.id,
@@ -70,11 +73,22 @@ class ChatModel with ChangeNotifier {
   ChatModel();
   getChannalsHistory() async {
     chatsList = await EmomApi().chatHistory();
+    orderByLastAction();
     notifyListeners();
   }
+   orderByLastAction(){
+   chatsList.sort((a,b)
+   { // print('${a.lastDate} ${b.lastDate} , ${b.lastDate.compareTo(a.lastDate)}');
+      return //b.lastDate=='False' ||a.lastDate=='False'?-1:
+      b.lastDate.compareTo(a.lastDate);
+   });
+  // notifyListeners();
+
+   }
+
 
   getChatInfo(channalId, context) {
-    print("channalId $channalId");
+    //print("channalId $channalId");
     List<Folowing> channalMember = List();
     List ids;
     List<Folowing> user =
@@ -90,10 +104,11 @@ class ChatModel with ChangeNotifier {
             Provider.of<ChatModel>(context, listen: false).chatsList[i].members;
       }
     }
-    print("ids $ids");
+   // print("ids $ids");
     for (int i = 0; i < user.length && i < ids.length; i++) {
       if (user[i].id == ids[i]) channalMember.add(user[i]);
     }
+   // notifyListeners();
     //print("ccc ${channalMember}");
     return channalMember;
   }
@@ -101,10 +116,23 @@ class ChatModel with ChangeNotifier {
   addNewChat(chat) => chatsList.add(chat);
   createChannal(chat, isCaht, isPrivate) async {
     // chatsList.removeLast();
-    await EmomApi().createNewChannal(chat.name, chat.members, isCaht,isPrivate);
-
-    await getChannalsHistory();
+  int id=  await EmomApi().createNewChannal(chat.name, chat.members, isCaht,isPrivate);
+         await getChannalsHistory();
+ // print('id new massege = $id');
+  notifyListeners();
+  return id;
   }
 
-  chatMassege(i, newmassege) => chatsList[i].lastMessage = newmassege;
+  chatLastMassege(i, newmassege) => chatsList[i].lastMessage = newmassege;
+  chatMasseges(id){
+    List<Massege> massegContex=List();
+   chatsList.forEach((element) {
+     if(element.id==id){
+       massegContex=element.massegContex;
+     }
+   });
+    //notifyListeners();
+
+    return massegContex;
+  }
 }

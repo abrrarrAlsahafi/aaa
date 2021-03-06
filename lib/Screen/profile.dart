@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:management_app/bottom_bar.dart';
 import 'package:management_app/common/constant.dart';
 import 'package:management_app/model/app_model.dart';
 import 'package:management_app/model/user.dart';
+import 'package:management_app/services/emom_api.dart';
 import 'package:management_app/widget/content_translate.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-
 import '../main.dart';
 
 class Profile extends StatefulWidget {
@@ -23,32 +24,37 @@ class _ProfileState extends State<Profile> {
   bool status1 = false;
   bool status2 = false;
   bool status3 = false;
- // Position _currentPosition;
   bool _disposed = false;
   Geolocator geolocator = Geolocator();
-  double _latitude=24.7348936;
-  double _longitude=46.783085899999996;
+  String _latitude = "24.7348936";
+  String _longitude = "46.783085899999996";
   bool _isGettingLocation;
   var val = AppModel().locale == 'ar' ? langList.first : langList.last;
 
-
+  var a = 1.1;
   void initState() {
     super.initState();
-    _isGettingLocation=true;
+    _isGettingLocation = false;
     _getCurrentLocation();
   }
 
- _getCurrentLocation() async{
-   Position position =  await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high, forceAndroidLocationManager: true);//.catchError((err) => print(err));
+  _getCurrentLocation() async {
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+        forceAndroidLocationManager: true); //.catchError((err) => print(err));
 
 // this will get the coordinates from the lat-long using Geocoder Coordinates
-   final coordinates =  Coordinates(position.latitude, position.longitude);
+    final coordinates = Coordinates(position.latitude, position.longitude);
 
 // this fetches multiple address, but you need to get the first address by doing the following two codes
-   var addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
-   _isGettingLocation=_longitude==addresses.first.coordinates.longitude && _latitude== addresses.first.coordinates.latitude;
-   print("countryName ${_isGettingLocation}, type ${addresses.first.coordinates}");
- }
+    var addresses =
+        await Geocoder.local.findAddressesFromCoordinates(coordinates);
+  setState(() {
+    _isGettingLocation =
+        (_longitude == (addresses.first.coordinates.longitude.toString())) &&
+            (_latitude == (addresses.first.coordinates.latitude.toString()));
+  });
+  }
 
   @override
   void dispose() {
@@ -60,99 +66,83 @@ class _ProfileState extends State<Profile> {
   Widget build(BuildContext context) {
     return profileApp();
   }
-
   profileApp() {
     return Scaffold(
-      body: Stack(
-        children: [
-          Container(
-            padding: EdgeInsets.all(18),
+      body: Container(
+        height: MediaQuery.of(context).size.height,
             color: hexToColor('#336699'),
-          ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Container(
-              height: MediaQuery.of(context).size.height / 1.3,
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(
-                    color: Colors.transparent,
+            child:Column(
+                children: [
+              Padding(
+               padding: const EdgeInsets.only(top: 16),
+                child: Row(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+    IconButton(
+    icon: Icon(
+    Icons.arrow_back_ios_rounded,
+    color: Colors.white,
+    size: 18,
+    ),
+    onPressed: () => Navigator.of(context).pop(),
+    ), Expanded(child: SizedBox(width: 12,)),
+    IconButton(
+    icon: Icon(
+    Icons.lock_outline_rounded,
+    color: Colors.white,
+    size: 18,
+    ),
+    onPressed: () async {
+      await EmomApi().logOut(username: Provider.of<UserModel>(context, listen: false).user.username, password: Provider.of<UserModel>(context,listen: false).user.pass, );
+
+      setState(() {
+    isLoggedIn=false;
+    Navigator.of(context).pushNamed('/b');
+
+    });
+    },
+    )
+    ],
+    ),
+    ),
+              Expanded(
+                    child: Container(
+                padding: EdgeInsets.only(top: MediaQuery.of(context).size.width / 66),
+                alignment: Alignment.topCenter,
+                child: Text(
+                    '${Provider.of<UserModel>(context).user.partnerDisplayName}',
+                    style: TextStyle(
+                        fontSize: 44,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
+                )),
                   ),
-                  borderRadius:
-                  BorderRadius.vertical(top: Radius.circular(33))),
-              child: employeeInfo(),
+                  Align(
+            alignment: Alignment.bottomCenter,
+            child: Expanded(
+              child: Container(
+                height: MediaQuery.of(context).size.height / 1.288,
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(
+                      color: Colors.transparent,
+                    ),
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(33))),
+                child: employeeInfo(),
+              ),
             ),
           ),
-          Container(
-              padding:
-              EdgeInsets.only(top: MediaQuery.of(context).size.width / 4),
-              alignment: Alignment.topCenter,
-              child: Text(
-                '${Provider.of<UserModel>(context).user.partnerDisplayName}',
-                style: TextStyle(
-                    fontSize: 44,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white),
-              )),
-          /* Container(
-              Text("${Provider.of<UserModel>(context).user.name}",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300)),
-            padding: EdgeInsets.symmetric(vertical: 117, horizontal: 142),
-            child: CircleAvatar(
-              radius: 66,
-              backgroundColor: Colors.white,
-              foregroundColor: Colors.black,
-              child: Text(
-                '${getInitials(Provider.of<UserModel>(context).user.name)}',
-                style: TextStyle(fontSize: 33, fontWeight: FontWeight.bold),
-              ),
-            ) CircleAvatar(
-              radius: 66,
-              backgroundColor: Colors.white,
-              child: Image.asset(
-                "assets/images/user.png",
-                color: Colors.black87,
-                width: 100,
-              ),
-            )
-            ,
-          ),*/
-          Padding(
-            padding: const EdgeInsets.only(top: 44),
-            child: Align(
-                alignment: Alignment.topLeft,
-                child: IconButton(
-                  icon: Icon(
-                    Icons.arrow_back_ios,
-                    color: Colors.white,
-                    size: 18,
-                  ),
-                  onPressed: () => Navigator.of(context).pop(),
-                )),
-          ),
-        ],
+ ],
       ),
-    );
+    ));
   }
 
   employeeInfo() {
     return Padding(
       padding: EdgeInsets.all(MediaQuery.of(context).size.width / 12),
-      child: Column(
+      child: ListView(
         children: [
-          /*
-          _currentPosition != null && _currentAddress != null
-              ? Text(_currentAddress,
-                  style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w300,
-                      color: Colors.black))
-              : Container(),
-*/
-
-          //  SizedBox(height: 10),
-          //Divider(color: Colors.grey),
-          // SizedBox(height: 22),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -214,7 +204,7 @@ class _ProfileState extends State<Profile> {
           ]),
           SizedBox(height: 10),
           Divider(color: Colors.grey),
-          SizedBox(height: 10),
+          SizedBox(height: 22),
 
           // SizedBox(height: MediaQuery.of(context).size.width / 6),
           ContentApp(
@@ -224,37 +214,41 @@ class _ProfileState extends State<Profile> {
                   fontWeight: FontWeight.bold,
                   fontSize: 16)),
           SizedBox(height: 22),
-          Container(
-              height: MediaQuery.of(context).size.width / 1.5,
-              width: MediaQuery.of(context).size.width / 1.5,
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(
-                    color: Colors.grey,
-                  ),
-                  borderRadius: BorderRadius.all(Radius.circular(22))),
-              child: Center(
-                child: _isGettingLocation == null
-                    ? ContentApp(
-                    code: 'loding',
-                    style: TextStyle(
-                        color: Colors.grey[400],
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16))
-                    : _isGettingLocation
-                    ? QrImage(
-                  data:
-                  "${Provider.of<UserModel>(context).user.uid+num.parse(DateTime.now().microsecond.toString())}",
-                  version: QrVersions.auto,
-                  size: MediaQuery.of(context).size.width/1.2,
-                )
-                    : ContentApp(
-                    code: 'place',
-                    style: TextStyle(
-                        color: Colors.grey[400],
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16)),
-              )),
+        //  Expanded(
+           // child:
+            Container(
+                height: MediaQuery.of(context).size.width / 1.5,
+                width: MediaQuery.of(context).size.width / 1.5,
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(
+                      color: Color(0xffe9a14e),
+                    ),
+                    borderRadius: BorderRadius.all(Radius.circular(22))),
+                child: Center(
+                  child: _isGettingLocation == null
+                      ? ContentApp(
+                          code: 'loding',
+                          style: TextStyle(
+                              color: Colors.grey[400],
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16))
+                      : _isGettingLocation
+                          ? QrImage(
+                              data:
+                                  "${Provider.of<UserModel>(context).user.uid + num.parse(DateTime.now().microsecond.toString())}",
+                              version: QrVersions.auto,
+                              size: MediaQuery.of(context).size.width / 1.2,
+                            )
+                          : ContentApp(
+                                code: 'place',
+                                style: TextStyle(
+                                    color: Colors.grey[400],
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16)),
+
+                )),
+        //  ),
           SizedBox(height: 20),
         ],
       ),

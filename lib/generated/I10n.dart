@@ -150,6 +150,22 @@ class S {
     return localizedValues['members'];
   }
 
+  String get projectTitle {
+    return localizedValues['projectTitle'];
+  }
+  String get projectTask {
+    return localizedValues['projectTask'];
+  }
+  String get description {
+    return localizedValues['description'];
+  }
+  String get assignedTo {
+    return localizedValues['assignedTo'];
+  }
+  String get welcomems {
+    return localizedValues['welcomems'];
+  }
+
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<S> {

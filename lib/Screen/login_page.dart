@@ -1,8 +1,11 @@
 import 'dart:async';
 
+import 'package:management_app/app_theme.dart';
 import 'package:management_app/generated/I10n.dart';
+import 'package:management_app/model/app_model.dart';
 import 'package:management_app/model/user.dart';
 import 'package:management_app/services/emom_api.dart';
+import 'package:management_app/widget/buttom_widget.dart';
 import 'package:management_app/widget/content_translate.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -37,7 +40,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void initState() {
-    timer =Timer.periodic(Duration(seconds: 2), (Timer t) {
+    timer =Timer.periodic(Duration(seconds: 5), (Timer t) {
     setState(() {
       isoffline=false;
     });
@@ -52,27 +55,31 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return
+      Scaffold(
         backgroundColor: const Color(0xfff3f6fc),
         body: ListView(
             children: <Widget>[
+              isoffline? Padding(
+                padding: EdgeInsets.only(top: MediaQuery.of(context).size.width/50),
+                child: Container(
+                    child:errmsg()
+                  //to show internet connection message on isoffline = true.
+                ),
+              ):Container(),
           Form(
             key: _formKey,
             autovalidate: _autoValidate,
             child: Column(
               children: <Widget>[
-                isoffline? Container(
-                    child:errmsg()
-                  //to show internet connection message on isoffline = true.
-                ):Container(),
                 Padding(
-                  padding:EdgeInsets.all(MediaQuery.of(context).size.width/6.5),
+                  padding:EdgeInsets.all(MediaQuery.of(context).size.width/10),
                   child: Stack(
                       alignment: Alignment.topCenter,
                       overflow: Overflow.visible,
                       children: <Widget>[
                         Container(
-                          height: 200.0,
+                          height: MediaQuery.of(context).size.height/3,
                           decoration: BoxDecoration(
                             image: DecorationImage(
                               image: const AssetImage('assets/images/bgimgs.png'),
@@ -98,7 +105,7 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             )),
                         Positioned(
-                          top: 190,
+                          top: 186,
                           child: Align(
                               //heightFactor: 4.0,
                               alignment: Alignment.bottomCenter,
@@ -126,7 +133,7 @@ class _LoginPageState extends State<LoginPage> {
                 Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: TextFormField(
-                    initialValue: getEmail().toString(),
+                 //   initialValue:  getEmail().toString()==null?'':getEmail().toString(),
                       // autofocus: true,
                       keyboardType: TextInputType.emailAddress,
                       onChanged: (str) {
@@ -192,25 +199,12 @@ class _LoginPageState extends State<LoginPage> {
                     style: TextStyle(
                       color: Colors.red,
                     )),
-                Align(
-                    alignment: Alignment.bottomRight,
-                    child: Padding(
-                        padding: EdgeInsets.only(right: 10.0),
-                        child: InkWell(
-                          child: ContentApp(
-                            code: 'forgotpassword',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: const Color(0xff336699),
-                            ),
-                            // textAlign: TextAlign.left,
-                          ),
-                          onTap: () {},
-                        ))),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  //crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     Checkbox(
-                      activeColor: Color(0xffe9a14e),
+                      activeColor: MyTheme.kPrimaryColorVariant,
                       value: _isSelected,
                       onChanged: (bool newValue) {
                         setState(() {
@@ -230,21 +224,13 @@ class _LoginPageState extends State<LoginPage> {
                     )),
                   ],
                 ),
-                Container(
-                  height: 80.0,
-                  width: 500.0,
-                  margin: EdgeInsets.all(10.0),
-                  padding: EdgeInsets.all(10.0),
-                  child: RaisedButton(
-                    textColor: Colors.white,
-                    color: Color(0xff336699),
+                ButtonWidget(
                     onPressed: () => validateInput(),
                     child: ContentApp(
                         code: 'bottonlogin',
                         style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold,)),
+                            fontSize: 22, fontWeight: FontWeight.bold,)),
                   ),
-                )
               ],
             ),
           )
@@ -275,12 +261,16 @@ class _LoginPageState extends State<LoginPage> {
         setState(() {
           isLoggedIn = true;
         });
-        Navigator.push(context, new MaterialPageRoute(builder: (context) => BottomBar()));
+
+       Navigator.of(context).pushNamed('/a');
+       AppModel().config(context);
+      //  Navigator.push(context, new MaterialPageRoute(builder: (context) => BottomBar()));
         if (_isSelected) {
           // saveEmail(model.username);
         }
       }
-    } else {
+    }
+    else {
       setState(() {
         _autoValidate = true;
       });
@@ -305,8 +295,6 @@ class _LoginPageState extends State<LoginPage> {
           //show error message text
         ]),
       );
-
-
   }
 
   Future<void> saveEmail(bool saved, email) async {
@@ -315,11 +303,10 @@ class _LoginPageState extends State<LoginPage> {
       prefs.setString('email',email);
     }
   }
- String getEmail() {
-    //if(email!=null){
-     /// SharedPreferences prefs = await SharedPreferences.getInstance();
-   //String email=prefs.getString('email');
-   // }
-    return email==null?'':email;
+ Future<String> getEmail() async {
+   if(email!=null){
+     SharedPreferences prefs = await SharedPreferences.getInstance();
+     return prefs.getString('email'); }
+    //return email==null?'':email;
   }
 }

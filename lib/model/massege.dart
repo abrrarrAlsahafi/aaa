@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:management_app/model/channal.dart';
 import 'dart:core';
 
 import 'package:management_app/services/emom_api.dart';
+import 'package:provider/provider.dart';
 
 class Massege {
   var text;
@@ -34,27 +36,45 @@ class Massege {
 class MassegesContent extends ChangeNotifier {
   bool isNewMassege=false;
   List massegesContent;
- // Massege massege;//= massegesContent.last;
 
 
   MassegesContent();
   get masseges=>massegesContent.last;
+
   getMassegesContent(mid) async {
     massegesContent=await EmomApi().getMassegesContent(mid);
-    //isNewMassege=true;
-  //  massege =  massegesContent.last;
-   return massegesContent; //await EmomApi().getMassegesContent(mid);
+   return massegesContent;
+   //await EmomApi().getMassegesContent(mid);
   }
 
+  gitAllMessagees(context){
+   Provider.of<ChatModel>(context, listen: false).chatsList.forEach((element) async {
+     element.massegContex= await getMassegesContent(element.id);
+  //print("masseges .${element.id}\n. ${element.massegContex}");
+   });
+}
 }
 
 class NewMessagesModel extends ChangeNotifier {
   NewMessages newMessages;
+  ChannelMessages channelMessages;
+  int totalm=0;
   NewMessagesModel();
   newMessagesList() async {
     newMessages = await EmomApi().newMasseges();
+    totalm=newMessages.totalNewMessages;
     // print(newMessages.totalNewMessages);
     return newMessages;
+  }
+
+  isHaveNewMassge(int id) {
+    bool ishave = false;
+    newMessages.channelMessages.forEach((element) {
+      if (id == element.channelId) {
+        ishave = true;
+      }
+    });
+    return ishave;
   }
 }
 

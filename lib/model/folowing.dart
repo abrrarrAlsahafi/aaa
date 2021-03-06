@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:management_app/model/user.dart';
 import 'package:management_app/services/emom_api.dart';
+import 'package:provider/provider.dart';
 
 class Folowing {
   int id;
@@ -25,6 +27,7 @@ class Folowing {
 }
 
 class FollowingModel extends ChangeNotifier {
+  var imageUser;
   List<Folowing> followList;
   Folowing isAdmin;
   FollowingModel(this.followList);
@@ -54,11 +57,7 @@ class FollowingModel extends ChangeNotifier {
   }
 
   channalAdmins(adminId) {
-    // print('adminId');
-
     for (int i = 0; i < followList.length; i++) {
-      // print('${followList[i].id}');
-
       if (followList[i].id == adminId) {
         //print('adminId');
         isAdmin = followList[i];
@@ -67,4 +66,11 @@ class FollowingModel extends ChangeNotifier {
     }
     return isAdmin;
   }
+
+  gitUserImage(context){
+     followList.forEach((element) {
+       return element.name==Provider.of<User>(context).name ?element.image:'no image';
+     });
+  }
+
 }

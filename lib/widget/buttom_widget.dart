@@ -11,7 +11,8 @@ class ButtonWidget extends StatelessWidget {
     return Container(
       height: 80.0,
       width: 500.0,
-      padding: EdgeInsets.all(10.0),
+
+      padding: EdgeInsets.all(12.0),
       child: RaisedButton(
         textColor: Colors.white,
         color: Color(0xff336699),

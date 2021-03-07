@@ -1,6 +1,5 @@
 import 'dart:convert' as convert;
 import 'dart:convert';
-import 'package:management_app/Screen/project.dart';
 import 'package:management_app/model/channal.dart';
 import 'package:management_app/model/folowing.dart';
 import 'package:management_app/model/massege.dart';
@@ -25,7 +24,7 @@ class EmomApi implements BaseServices {
 
   _setHeaders(id) => {
         'Content-Type': 'application/json',
-        'Accept': 'application/json',
+        //'Accept': 'application/json',
         'Cookie': 'frontend_lang=en_US; session_id=$id'
       };
 
@@ -240,16 +239,24 @@ class EmomApi implements BaseServices {
 
   @override
   Future<List<Task>> getUserTask(projectId) async {
+     // var params ={"project_id" : "$projectId".toString() };//{"jsonrpc" : "2.0" ,  "params" : {"project_id" : "$projectId".toString() }};
+    //  Uri uri=Uri.parse("${_client}project/get_task_details");
+     // final newURI = uri.replace(queryParameters: params);
     SharedPreferences localStorage = await SharedPreferences.getInstance();
     String id = localStorage.get('session_id');
     try {
-      http.Response response =
-          await http.post("${_client}project/get_task_details",
-              body:convert.jsonEncode( {"jsonrpc" : "2.0" , "params" : {"project_id" : projectId }}),
-              headers: {'Cookie': 'frontend_lang=en_US; session_id=$id'});
-      List<Task> list = [];
+      http.Response response = await http.post(
+          "${_client}project/get_task_details",
+      body:convert.jsonEncode({
+        "jsonrpc": "2.0",
+        "params": {"project_id" : "$projectId"}
+        },
+      )
+      , headers: _setHeaders(id));
+             List<Task> list = [];
       //var finalData = str.(/\\/g, "");
-      print(response.body.replaceAll('/', ''));
+      //if (response.statusCode == 200)
+      //  print("${response.body.replaceAll('"\"', "")}");
 /*
       // var respData = json.decode(response.body);
       print(response.body);

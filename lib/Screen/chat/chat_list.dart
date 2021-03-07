@@ -63,7 +63,7 @@ class _ChatListState extends State<ChatList> with TickerProviderStateMixin {
     chatHestoryList = Provider.of<ChatModel>(context, listen: false).chatsList;
     items = List.generate(
       chatHestoryList.length,
-          (i) => MessageItem(chatHestoryList[i]),
+          (i) => MessageItem(chatHestoryList[i], null),
     );
     //setState(() {});
   }
@@ -99,7 +99,7 @@ class _ChatListState extends State<ChatList> with TickerProviderStateMixin {
     chatHestoryList.forEach((userDetail) {
       if (userDetail.name.contains(text) ||
           userDetail.lastMessage.contains(text))
-        _searchResult.add(MessageItem(userDetail));
+        _searchResult.add(MessageItem(userDetail, null));
     });
 
     setState(() {});
@@ -189,7 +189,7 @@ class _ChatListState extends State<ChatList> with TickerProviderStateMixin {
                                           chatHestoryList[index].name))),
                             ),
                             leading: item.buildLeading(context, index),
-                            title: item.buildTitle(context, index, false),
+                            title: item.buildTitle(context, index),
                             subtitle: item.buildSubtitle(context, index),
                             trailing: item.buildTrailing(context, index),
                           ),
@@ -218,7 +218,7 @@ class _ChatListState extends State<ChatList> with TickerProviderStateMixin {
 /// The base class for the different types of items the list can contain.
 abstract class ListItem {
   /// The title line to show in a list item.
-  Widget buildTitle(BuildContext context, int index, bool isUsers);
+  Widget buildTitle(BuildContext context, int index);
 
   /// The subtitle line, if any, to show in a list item.
   Widget buildSubtitle(BuildContext context, int index);
@@ -231,23 +231,24 @@ abstract class ListItem {
 /// A ListItem that contains data to display a message.
 class MessageItem implements ListItem {
   final item;
+  final isFolowing;
 
-  MessageItem(this.item);
+  MessageItem(this.item, this.isFolowing);
 
   Widget buildLeading(BuildContext context, int index) =>
       MembertImage(item: item);
 
-  Widget buildTitle(BuildContext context, int index, isUsers) => Text(
+  Widget buildTitle(BuildContext context, int index) => Text(
         item.name,
         style: MyTheme.heading2,
       );
 
   Widget buildSubtitle(BuildContext context, int index) => Text(
-        item.lastMessage.length > 22
+      isFolowing==null?  item.lastMessage.length > 22
             ? item.lastMessage.substring(0, 22) + '..'
             : item.lastMessage == 'None'
                 ? ''
-                : item.lastMessage,
+                : item.lastMessage:isFolowing?'admin':'',
         style: TextStyle(
           color: const Color(0xff336699),
         ),
@@ -293,7 +294,7 @@ class _CreateGruopeState extends State<CreateGruope> {
     widget.members.add(admin);
     items = List.generate(
       widget.members.length,
-      (i) => MessageItem(widget.members),
+      (i) => MessageItem(widget.members, null),
     );
   }
 
@@ -440,7 +441,7 @@ class _ListUsersState extends State<ListUsers> {
     listFolow = Provider.of<FollowingModel>(context, listen: false).followList;
     items = List.generate(
       listFolow.length,
-      (i) => MessageItem(listFolow[i]),
+      (i) => MessageItem(listFolow[i],null),
     );
     isChecked = List<bool>.filled(items.length, false);
 
@@ -566,7 +567,7 @@ class _ListUsersState extends State<ListUsers> {
                 },
                 title: ListTile(
                   leading: item.buildLeading(context, index),
-                  title: item.buildTitle(context, index, true),
+                  title: item.buildTitle(context, index),
                 ),
               )
             : ListTile(
@@ -587,7 +588,7 @@ class _ListUsersState extends State<ListUsers> {
                   });
                 }),
                 leading: item.buildLeading(context, index),
-                title: item.buildTitle(context, index, true),
+                title: item.buildTitle(context, index),
               );
       },
     );

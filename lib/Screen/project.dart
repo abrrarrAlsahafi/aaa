@@ -88,7 +88,7 @@ List<bool> fillStar=List.filled(22, false);
                                 child: ListTile(
                                   onTap:() => Navigator.push(
                                     context,
-                                    MaterialPageRoute(builder: (context) => TaskScreen()),
+                                    MaterialPageRoute(builder: (context) => TaskScreen(projectid: _userDetails[index].id)),
                                   ),
                                   title:Text(_searchResult.length != 0 || controller.text.isNotEmpty?_searchResult[index].name:_userDetails[index].name),
                                  // subtitle: Text('Task: '),

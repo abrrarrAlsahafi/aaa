@@ -11,8 +11,8 @@ import 'package:provider/provider.dart';
 
 class CreateMeetings extends StatefulWidget {
   final isTask;
-
-  const CreateMeetings({Key key, this.isTask}) : super(key: key);
+  final projectid;
+  const CreateMeetings({Key key, this.isTask, this.projectid}) : super(key: key);
 
   @override
   _CreateMeetingsState createState() => _CreateMeetingsState();
@@ -290,14 +290,14 @@ class _CreateMeetingsState extends State<CreateMeetings> {
           _formKey.currentState.save();
           if(widget.isTask){
             _task.state='New';
-            print(_task.toString());
+           // print(_task.toString());
               taskList.add(_task);
               expandList.add(false);
-             await Provider.of<TaskModel>(context,listen: false).creatNewTask(_task.taskName);//.userTasks.add(_task);
-            Navigator.of(context).pop();
+             await Provider.of<TaskModel>(context,listen: false).creatNewTask(_task.taskName,widget.projectid);//.userTasks.add(_task);
+              Navigator.of(context).pop();
           }else{
             _meettingsModel.state='Schedule';
-            print(_meettingsModel.toString());
+           // print(_meettingsModel.toString());
             Navigator.of(context).pop();
           }
         }else {

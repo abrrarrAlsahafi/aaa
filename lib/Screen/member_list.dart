@@ -62,7 +62,7 @@ class _MembersListState extends State<MembersList> {
                         dense: true,
                         leading: item.buildLeading(context, index),
                         title: item.buildTitle(context, index),
-                        subtitle: item.buildSubtitle(context),
+                        subtitle: item.buildSubtitle(context,index),
                       );
                   },
                 ),
@@ -71,7 +71,7 @@ class _MembersListState extends State<MembersList> {
     );
   }
 }
-
+/*
 /// The base class for the different types of items the list can contain.
 abstract class ListItem {
   /// The title line to show in a list item.
@@ -113,3 +113,4 @@ class MessageItem implements ListItem {
             color: const Color(0xff336699), fontWeight: FontWeight.w300),
       );
 }
+*/

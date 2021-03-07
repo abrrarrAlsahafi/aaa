@@ -1,9 +1,9 @@
-
 import 'package:flutter/material.dart';
 import 'package:management_app/common/constant.dart';
 import 'package:management_app/model/folowing.dart';
 import 'package:management_app/widget/bulid_memberimage.dart';
 import 'package:management_app/widget/flat_action_botton_wedget.dart';
+import 'package:management_app/Screen/chat/chat_list.dart';
 import 'package:provider/provider.dart';
 
 import '../member_list.dart';
@@ -28,6 +28,8 @@ class _ChatInfoState extends State<ChatInfo> {
   void initState() {
     super.initState();
     if (widget.channalId == null) {
+      //widget.sender=
+    //  members=List.generate(3, (index) => Folowing(image: 'False',id: 12,name: 'abrar', isAddmin: false));
       print("is chat ${widget.sender.isChat}");
     } else {
       buildItem(context);
@@ -86,17 +88,18 @@ class _ChatInfoState extends State<ChatInfo> {
               : MembersList(member: members, admin: widget.sender.adminId)
         ],
       ),
-      floatingActionButton: FlatActionButtonWidget(
-            onPressed: (){},
+      floatingActionButton:widget.groupchat? FlatActionButtonWidget(
+            onPressed:(){
+             Navigator.of(context).push(MaterialPageRoute(builder: (context)=>ListUsers()));
+            },
             icon: Icons.person_add_alt_1_outlined
-      ),
+      ):Container(),
     );
   }
 
   buildItem(context) {
     var memberss =
         widget.sender.members != null ? widget.sender.members : widget.sender;
-
     members = Provider.of<FollowingModel>(context, listen: false)
         .getMembersChat(memberss, widget.sender.adminId);
 

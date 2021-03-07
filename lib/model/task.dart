@@ -44,15 +44,16 @@ class Task {
 }
 
 class TaskModel with ChangeNotifier {
-  final List<Task> userTasks;
+   List<Task> userTasks;
   TaskModel(this.userTasks);
-  getUserTasks() async {
-    return await EmomApi().getUserTask();
+  getUserTasks(projectid) async {
+    userTasks= await EmomApi().getUserTask(projectid);
+    return userTasks;
   }
 
-  Future<int> creatNewTask(createTask) async {
+  Future<int> creatNewTask(createTask,projectid ) async {
     int id =await EmomApi().createTask(taskName: createTask);
-    getUserTasks();
+    getUserTasks(projectid);
    return id;
 
   }

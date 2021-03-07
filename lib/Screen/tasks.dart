@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:management_app/Screen/create_meeting.dart';
 import 'package:management_app/common/constant.dart';
+import 'package:management_app/generated/I10n.dart';
 import 'package:management_app/model/folowing.dart';
 import 'package:management_app/model/task.dart';
 import 'package:management_app/model/user.dart';
@@ -12,14 +13,15 @@ import 'package:provider/provider.dart';
 
 class TaskScreen extends StatefulWidget {
   bool isAdmin;
-  TaskScreen({Key key, this.isAdmin}) : super(key: key);
+  final projectid;
+  TaskScreen({Key key, this.isAdmin, this.projectid}) : super(key: key);
 
   @override
   _TaskScreenState createState() => _TaskScreenState();
 }
 List stageList = ['New', 'Assign', 'In Progress', 'Done', 'Canceled'];
 List<bool> expandList=[false,false,false];
-List<Task> taskList=List();//.generate(2, (index) => Task(taskName: 'a$index'));
+List<Task> taskList=List();//.generate(6, (index) => Task(taskName: 'task$index'));
 class _TaskScreenState extends State<TaskScreen> with TickerProviderStateMixin {
   String dropdownValue; //= 'New';
   List listStageTask = List();
@@ -33,7 +35,9 @@ class _TaskScreenState extends State<TaskScreen> with TickerProviderStateMixin {
     //Timer(Duration(seconds: 1), () {  if (!_disposed) this.taskHistory();});
     super.initState();
     taskGeneriate();
-    taskHistory();
+   // taskHistory();
+    taskList=List.generate(3, (index) => Task(taskName: 'task$index'));
+
     _tabController = TabController(vsync: this, length: stageList.length);
 
     _tabController.addListener(() {
@@ -49,8 +53,8 @@ class _TaskScreenState extends State<TaskScreen> with TickerProviderStateMixin {
     expandList.where((item) => item == false).length;//=List.generate(taskList.length, (index) => ()=>expandList[i])
 }
   Future<void> taskHistory() async {
-    taskList = await Provider.of<TaskModel>(context, listen: false).getUserTasks();
-    listStageTask = listOftask(dropdownValue, stageList, taskList);
+    taskList = await Provider.of<TaskModel>(context, listen: false).getUserTasks(widget.projectid);
+   // listStageTask = listOftask(dropdownValue, stageList, taskList);
     setState(() {});
   }
 bool click = false;
@@ -128,7 +132,7 @@ bool click = false;
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-backgroundColor: hexToColor('#F3F6FC'),
+      backgroundColor: hexToColor('#F3F6FC'),
       body: FutureBuilder<void>(builder: (context, snapshot) {
         print(taskList.toString());
         if (snapshot.hasError || taskList == null){
@@ -144,7 +148,7 @@ backgroundColor: hexToColor('#F3F6FC'),
             floatingActionButton: FlatActionButtonWidget(
               icon: Icons.playlist_add,
                 onPressed: ()=> Navigator.push(
-                    context, MaterialPageRoute(builder: (context) => CreateMeetings(isTask:true,))).then((value) {
+                    context, MaterialPageRoute(builder: (context) => CreateMeetings(isTask:true,projectid: widget.projectid,))).then((value) {
                       setState(() {
                         taskList;
                     });}),
@@ -172,7 +176,7 @@ backgroundColor: hexToColor('#F3F6FC'),
                                             },
                                       item:taskList[index]// listOftask(stageList[i],  stageList, taskList)[index],
                                     ),
-                                  background: Provider.of<UserModel>(context).user.isAdmin?Container():
+                                  background:
                                     slideRightBackground(),
                                   secondaryBackground: slideLeftBackground(),
                                   confirmDismiss: (direction) async {
@@ -180,14 +184,15 @@ backgroundColor: hexToColor('#F3F6FC'),
                                       final bool res = await showDialog(
                                           context: context,
                                           builder: (BuildContext context) {
-                                            return AlertDialogWidget(index,direction);
+                                          //  return AlertDialogWidget(index);
                                           });
                                       return res;
                                     } else if(direction == DismissDirection.startToEnd){
                                       final bool res = await showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
+        return AlertDialogPM(index: index,dearection: false, title: Text((Provider.of<UserModel>(context).user.isAdmin)? "You want to assgin ${taskList[index].taskName} task to?":"Log note"));
+          /*AlertDialog(
       title: Text( "Why you want to redirct task to?"),
       content:  Container(
       width: double.minPositive,
@@ -209,7 +214,6 @@ backgroundColor: hexToColor('#F3F6FC'),
                     hintStyle: new TextStyle(
                       color: Colors.grey.shade500,
                       fontSize: 12.0,
-                      fontFamily: 'helvetica_neue_light',
                     ),
                   ),
                 )),
@@ -239,7 +243,7 @@ backgroundColor: hexToColor('#F3F6FC'),
               ),
             ) ],
       ),
-      ));
+      ));*/
       }); } },
 
                               ));
@@ -250,7 +254,7 @@ backgroundColor: hexToColor('#F3F6FC'),
     );
   }
 
-  Widget AlertDialogWidget(index, direction) {
+ /* Widget AlertDialogWidget(index, lognot) {
     return AlertDialog(
         title: Text((Provider.of<UserModel>(context).user.isAdmin)? "You want to assgin ${taskList[index].taskName} task to?":"Log note"),
         content:(Provider.of<UserModel>(context).user.isAdmin)? Container(
@@ -263,7 +267,6 @@ backgroundColor: hexToColor('#F3F6FC'),
                 color: Colors.black12,
               ),
             ),
-
             shrinkWrap: true,
             itemCount: Provider.of<FollowingModel>(context,listen: false).followList.length,
             itemBuilder: (BuildContext context, int index) {
@@ -271,7 +274,7 @@ backgroundColor: hexToColor('#F3F6FC'),
                 title: Text( Provider.of<FollowingModel>(context,listen: false).followList[index].name),
                 onTap: () {
                   setState(() {
-                    taskList.removeAt(direction.index);
+                    // taskList.removeAt(direction.index);
                   });
                   Navigator.of(context).pop();
                   ///Todo: edit assigin to new employee
@@ -281,59 +284,194 @@ backgroundColor: hexToColor('#F3F6FC'),
           ),
         ):
         Container(
-    width: double.minPositive,
-    height: 120,
-    child:Column(
-    children: [
-    Expanded(
-    child: new Container(
-    child: new TextField(
-    decoration: new InputDecoration(
-    border: InputBorder.none,
-    filled: false,
-    contentPadding: new EdgeInsets.only(
-    left: 10.0,
-    top: 10.0,
-    bottom: 10.0,
-    right: 10.0),
-    hintText: ' add review',
-    hintStyle: new TextStyle(
-    color: Colors.grey.shade500,
-    fontSize: 12.0,
-    fontFamily: 'helvetica_neue_light',
-    ),
-    ),
-    )),
-    flex: 2,
-    ),
+          width: double.minPositive,
+          height: 120,
+          child:Column(
+            children: [
+              Expanded(
+                child: new Container(
+                    child: Form(
+                      key: _formKey,
+                      autovalidate: _autoValidate,
+                      child: TextFormField(
 
-    // dialog bottom
-    new Container(
-    // padding: new EdgeInsets.all(16.0),
-    decoration: new BoxDecoration(
-    color: const Color(0xffe9a14e),
-    borderRadius: BorderRadius.all(Radius.circular(18))
-    ),
-    child: FlatButton(
-    onPressed: (){
-    Navigator.pop(context);
-    },
-    child: Text(
-    'Okay',
-    style: TextStyle(
-    color: Colors.white,
-    fontSize: 18.0,
-    fontFamily: 'helvetica_neue_light',
-    ),
-    textAlign: TextAlign.center,
-    ),
-    ),
-    ) ],
-    ),
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return S.of(context).empty;
+                          } else return null;
+                        },
+                        onSaved: (String value) {
+                          lognot = value;
+                        },
+                        decoration: new InputDecoration(
+                          border: InputBorder.none,
+                          filled: false,
+
+                          contentPadding: new EdgeInsets.only(
+                              left: 10.0,
+                              top: 10.0,
+                              bottom: 10.0,
+                              right: 10.0),
+                          hintText: 'add review',
+                          hintStyle: new TextStyle(
+                            color: Colors.grey.shade500,
+                            fontSize: 12.0,
+                            //fontFamily: 'helvetica_neue_light',
+                          ),
+                        ),
+                      ),
+                    )),
+                flex: 2,
+              ),
+
+              // dialog bottom
+              new Container(
+                // padding: new EdgeInsets.all(16.0),
+                decoration: new BoxDecoration(
+                    color: const Color(0xffe9a14e),
+                    borderRadius: BorderRadius.all(Radius.circular(12))
+                ),
+                child: FlatButton(
+                  onPressed: (){
+                    if (_formKey.currentState.validate()) {
+                      print('valid');
+
+                      _formKey.currentState.save();
+                      //  Navigator.pop(context);
+                    }
+                    else {
+                      setState(() {
+                        _autoValidate = true;
+                      });
+                    }
+                  },
+                  child: Text(
+                    'Oka',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18.0,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ) ],
+          ),
         )
     );
-  }
+  }*/
 }
+class AlertDialogPM extends StatelessWidget {
+  final index;
+final title;
+final content;
+final dearection;
+final _formKey = GlobalKey<FormState>();
+bool _autoValidate = false;
+String lognot;
+
+AlertDialogPM({Key key, this.title, this.content, this.dearection, this.index}) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+        title: title, //,
+        content:
+        //(Provider.of<UserModel>(context).user.isAdmin)?
+       dearection? Container(
+          width: double.minPositive,
+          height: 300,
+          child: ListView.separated(
+            separatorBuilder: (context, index) => Padding(
+              padding: EdgeInsets.symmetric(horizontal: 12),
+              child: Divider(
+                color: Colors.black12,
+              ),
+            ),
+            shrinkWrap: true,
+            itemCount: Provider.of<FollowingModel>(context,listen: false).followList.length,
+            itemBuilder: (BuildContext context, int index) {
+              return ListTile(
+                title: Text( Provider.of<FollowingModel>(context,listen: false).followList[index].name),
+                onTap: () {
+
+                  Navigator.of(context).pop();
+                  ///Todo: edit assigin to new employee
+                },
+              );
+            },
+          ),
+        )
+        : Container(
+          width: double.minPositive,
+          height: 120,
+          child:Column(
+            children: [
+              Expanded(
+                child: new Container(
+                    child: Form(
+                      key: _formKey,
+                      //autovalidate: _autoValidate,
+                      child: TextFormField(
+
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return S.of(context).empty;
+                          } else return null;
+                        },
+                        onSaved: (String value) {
+                          lognot = value;
+                        },
+                        decoration: new InputDecoration(
+                          border: InputBorder.none,
+                          filled: false,
+
+                          contentPadding: new EdgeInsets.only(
+                              left: 10.0,
+                              top: 10.0,
+                              bottom: 10.0,
+                              right: 10.0),
+                          hintText: 'add review',
+                          hintStyle: new TextStyle(
+                            color: Colors.grey.shade500,
+                            fontSize: 12.0,
+                            //fontFamily: 'helvetica_neue_light',
+                          ),
+                        ),
+                      ),
+                    )),
+                flex: 2,
+              ),
+
+              // dialog bottom
+              new Container(
+                // padding: new EdgeInsets.all(16.0),
+                decoration: new BoxDecoration(
+                    color: const Color(0xffe9a14e),
+                    borderRadius: BorderRadius.all(Radius.circular(12))
+                ),
+                child: FlatButton(
+                  onPressed: (){
+                    if (_formKey.currentState.validate()) {
+                      print('valid');
+                      _formKey.currentState.save();
+                      //  Navigator.pop(context);
+                    }
+
+                  },
+                  child: Text(
+                    'Okay',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18.0,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ) ],
+          ),
+        )
+    );  }
+}
+
 
 getTab(index, child, _selectedTab) {
   return Tab(

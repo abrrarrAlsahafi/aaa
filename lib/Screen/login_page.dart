@@ -60,26 +60,24 @@ class _LoginPageState extends State<LoginPage> {
         backgroundColor: const Color(0xfff3f6fc),
         body: ListView(
             children: <Widget>[
-              isoffline? Padding(
-                padding: EdgeInsets.only(top: MediaQuery.of(context).size.width/50),
-                child: Container(
-                    child:errmsg()
-                  //to show internet connection message on isoffline = true.
-                ),
-              ):Container(),
+              isoffline?
+                    errmsg()
+              :Container(),
           Form(
             key: _formKey,
             autovalidate: _autoValidate,
             child: Column(
               children: <Widget>[
                 Padding(
-                  padding:EdgeInsets.all(MediaQuery.of(context).size.width/10),
+                  padding:EdgeInsets.all(MediaQuery.of(context).size.width/22),
                   child: Stack(
                       alignment: Alignment.topCenter,
                       overflow: Overflow.visible,
                       children: <Widget>[
                         Container(
-                          height: MediaQuery.of(context).size.height/3,
+                          width: 300.0,
+                          height: 220.0,
+                          //height: MediaQuery.of(context).size.height/2.6,
                           decoration: BoxDecoration(
                             image: DecorationImage(
                               image: const AssetImage('assets/images/bgimgs.png'),
@@ -87,8 +85,8 @@ class _LoginPageState extends State<LoginPage> {
                               colorFilter: new ColorFilter.mode(
                                   Colors.black.withOpacity(0.03),
                                   BlendMode.dstIn),
-                            ),
-                          ),
+                            )
+                          )
                         ),
                         Align(
                             alignment: Alignment.topCenter,
@@ -262,9 +260,10 @@ class _LoginPageState extends State<LoginPage> {
           isLoggedIn = true;
         });
 
-       Navigator.of(context).pushNamed('/a');
        AppModel().config(context);
-      //  Navigator.push(context, new MaterialPageRoute(builder: (context) => BottomBar()));
+        Navigator.of(context).pushNamed('/a');
+
+        //  Navigator.push(context, new MaterialPageRoute(builder: (context) => BottomBar()));
         if (_isSelected) {
           // saveEmail(model.username);
         }
@@ -284,13 +283,13 @@ class _LoginPageState extends State<LoginPage> {
 
       //if error is true then show error message box
       return Container(
-      padding: EdgeInsets.all(10.00),
+        height: MediaQuery.of(context).size.height/13,
+    //  padding: EdgeInsets.all(10.00),
       //  margin: EdgeInsets.only(bottom: 10.00),
         color: Colors.red,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-
           Text("No Internet Connection Available", style: TextStyle(color: Colors.white)),
           //show error message text
         ]),

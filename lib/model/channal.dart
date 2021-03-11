@@ -11,6 +11,7 @@ import 'folowing.dart';
 class Chat {
   int id;
   String name;
+
   String image;
   String lastMessage;
   String lastDate;
@@ -69,9 +70,8 @@ class Chat {
 
 class ChatModel with ChangeNotifier {
   List<Chat> chatsList;
-
   ChatModel();
-  getChannalsHistory() async {
+    getChannalsHistory() async {
     chatsList = await EmomApi().chatHistory();
     orderByLastAction();
     notifyListeners();
@@ -83,35 +83,7 @@ class ChatModel with ChangeNotifier {
       b.lastDate.compareTo(a.lastDate);
    });
   // notifyListeners();
-
    }
-
-
-  getChatInfo(channalId, context) {
-    //print("channalId $channalId");
-    List<Folowing> channalMember = List();
-    List ids;
-    List<Folowing> user =
-        Provider.of<FollowingModel>(context, listen: false).followList;
-
-    //Provider.of<ChatModel>(context).chatsList;
-    for (int i = 0;
-        i < Provider.of<ChatModel>(context, listen: false).chatsList.length;
-        i++) {
-      if (Provider.of<ChatModel>(context, listen: false).chatsList[i].id ==
-          channalId) {
-        ids =
-            Provider.of<ChatModel>(context, listen: false).chatsList[i].members;
-      }
-    }
-   // print("ids $ids");
-    for (int i = 0; i < user.length && i < ids.length; i++) {
-      if (user[i].id == ids[i]) channalMember.add(user[i]);
-    }
-   // notifyListeners();
-    //print("ccc ${channalMember}");
-    return channalMember;
-  }
 
   addNewChat(chat) => chatsList.add(chat);
   createChannal(chat, isCaht, isPrivate) async {
@@ -131,8 +103,28 @@ class ChatModel with ChangeNotifier {
        massegContex=element.massegContex;
      }
    });
-    //notifyListeners();
-
     return massegContex;
   }
+
+  bool isChat(chatId){
+    bool isChat=false;
+chatsList.where((element) => isChat= element.id==chatId?element.isChat:null);
+  return isChat;
+  }
+
+  getChannalInformation(channalId){
+    List members=List();
+    chatsList.forEach((element) {
+    if(element.id == channalId) members= element.members;
+    });
+
+    return members;
+}
+
+addMember(channelId,memberId) async {
+    await EmomApi().addMembers(channelId, memberId);
+    await getChannalsHistory();
+
+}
+
 }

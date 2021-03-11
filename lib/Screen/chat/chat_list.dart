@@ -31,7 +31,6 @@ class ChatList extends StatefulWidget {
 
 class _ChatListState extends State<ChatList> with TickerProviderStateMixin {
   List<Chat> chatHestoryList = List();
-  bool _disposed = false;
   TextEditingController controller = new TextEditingController();
 
   Timer timer;
@@ -39,11 +38,7 @@ class _ChatListState extends State<ChatList> with TickerProviderStateMixin {
 
   @override
   void initState() {
-
-   // chatHestoryList = Provider.of<ChatModel>(context, listen: false).chatsList;
-
-       getnewMasseges();
-    timer = Timer.periodic(Duration(seconds: 5), (Timer t) {
+     timer = Timer.periodic(Duration(seconds: 5), (Timer t) {
       if (Provider.of<NewMessagesModel>(context, listen: false).totalm > 0) {
         getnewMasseges();
       }
@@ -54,16 +49,14 @@ class _ChatListState extends State<ChatList> with TickerProviderStateMixin {
   @override
   void dispose() {
     timer?.cancel();
-    _disposed = true;
     super.dispose();
   }
 
   checkForNewSharedLists() {
     newMessege = Provider.of<NewMessagesModel>(context, listen: false).newMessages;
-    chatHestoryList = Provider.of<ChatModel>(context, listen: false).chatsList;
-    items = List.generate(
+    items =chatHestoryList==null?[]: List.generate(
       chatHestoryList.length,
-          (i) => MessageItem(chatHestoryList[i], null),
+          (i) => MessageItem(chatHestoryList[i], false),
     );
     //setState(() {});
   }
@@ -82,7 +75,6 @@ class _ChatListState extends State<ChatList> with TickerProviderStateMixin {
             e.newMessage = true;
             e.lastMessage = element.lastMessage;
             e.lastDate = element.lastDate;
-
           }
         });
       });
@@ -110,122 +102,129 @@ class _ChatListState extends State<ChatList> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        floatingActionButton: FlatActionButtonWidget(
-          icon: Icons.chat_outlined,
-          onPressed: () => Navigator.push(
-              context, MaterialPageRoute(builder: (context) => ListUsers())),
-          tooltip: 'Chat',
-        ),
-        body: FutureBuilder<void>(builder: (context, asyncProduct) {
-          if (asyncProduct.hasError && chatHestoryList==null) {
-            return Center(
-              child: CircularProgressIndicator(
-                backgroundColor: Color(0xff336699),
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-              ),
-            );
-          } else {
-            return Column(children: [
-              search
-                  ? ListTile(
-                      leading: new Icon(Icons.search),
-                      title: new TextField(
-                        controller: controller,
-                        decoration: new InputDecoration(
-                            hintText: 'Search', border: InputBorder.none),
-                        onChanged: onSearchTextChanged,
-                      ),
-                      trailing: new IconButton(
-                        icon: new Icon(Icons.close),
-                        onPressed: () {
-                          controller.clear();
-                          onSearchTextChanged('');
-                        },
-                      ),
-                    )
-                  : Container(),
-              Expanded(
-                child: Container(
-                    padding: EdgeInsets.symmetric(
-                        vertical: MediaQuery.of(context).size.width / 66),
-                    height: MediaQuery.of(context).size.height,
-                    child: ListView.separated(
-                      // Let the ListView know how many items it needs to build.
-                      itemCount: _searchResult.length != 0 ||
-                              controller.text.isNotEmpty
-                          ? _searchResult.length
-                          : chatHestoryList.length,
-                      //items.length,
-                      separatorBuilder: (context, index) => Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 12),
-                        child: Divider(
-                          color: Colors.black12,
+    return Consumer<ChatModel>(
+        builder: (context, myCounter, _) {
+          chatHestoryList=myCounter.chatsList;
+        //  print("new provider ${myCounter.chatsList}");
+          checkForNewSharedLists();
+      //child:
+      return Scaffold(
+          floatingActionButton: FlatActionButtonWidget(
+            icon: Icons.chat_outlined,
+            onPressed: () => Navigator.push(
+                context, MaterialPageRoute(builder: (context) => ListUsers())),
+            tooltip: 'Chat',
+          ),
+          body: FutureBuilder<void>(builder: (context, asyncProduct) {
+      if (asyncProduct.hasError || chatHestoryList==null) {
+      return Center(
+      child: CircularProgressIndicator(
+      backgroundColor: Color(0xff336699),
+      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+      ),
+      );
+      } else {
+      return Column(children: [
+                search
+                    ? ListTile(
+                        leading: new Icon(Icons.search),
+                        title: new TextField(
+                          controller: controller,
+                          decoration: new InputDecoration(
+                              hintText: 'Search', border: InputBorder.none),
+                          onChanged: onSearchTextChanged,
                         ),
-                      ),
-                      // Provide a builder function. This is where the magic happens.
-                      // Convert each item into a widget based on the type of item it is.
-                      itemBuilder: (context, index) {
-                        final item = _searchResult.length != 0 ||
+                        trailing: new IconButton(
+                          icon: new Icon(Icons.close),
+                          onPressed: () {
+                            controller.clear();
+                            onSearchTextChanged('');
+                          },
+                        ),
+                      )
+                    : Container(),
+                Expanded(
+                  child: Container(
+                      padding: EdgeInsets.symmetric(
+                          vertical: MediaQuery.of(context).size.width / 66),
+                      height: MediaQuery.of(context).size.height,
+                      child: ListView.separated(
+                        // Let the ListView know how many items it needs to build.
+                        itemCount: _searchResult.length != 0 ||
                                 controller.text.isNotEmpty
-                            ? _searchResult[index]
-                            : items[index];
-                        return Stack(children: [
-                          ListTile(
-                            dense: true,
-                            onTap: () => Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  // settings: RouteSettings(name: "boo"),
-                                  builder: (context) => MyDirectChatDetailPage(
-                                      sender: chatHestoryList[index],
-                                      ischatGroup: false,
-                                      isPrivetGroup: false,
-                                      newChat: false,
-                                      isChat: chatHestoryList[index].isChat,
-                                      member: chatHestoryList[index].members,
-                                      mid: chatHestoryList[index].id,
-                                      title: chatTitle(
-                                          chatHestoryList[index].name))),
-                            ),
-                            leading: item.buildLeading(context, index),
-                            title: item.buildTitle(context, index),
-                            subtitle: item.buildSubtitle(context, index),
-                            trailing: item.buildTrailing(context, index),
+                            ? _searchResult.length
+                            : chatHestoryList.length,
+                        //items.length,
+                        separatorBuilder: (context, index) => Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 12),
+                          child: Divider(
+                            color: Colors.black12,
                           ),
-                          chatHestoryList[index].newMessage != null
-                              ? chatHestoryList[index].newMessage
-                                  ? Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Align(
-                                        alignment: Alignment.topLeft,
-                                        child: Icon(Icons.circle,
-                                            color: Color(0xffe9a14e)),
-                                      ),
-                                    )
-                                  : Container()
-                              : Container()
-                        ]);
-                      },
-                    )),
-              ),
-            ]);
-          }
-        }));
+                        ),
+                        // Provide a builder function. This is where the magic happens.
+                        // Convert each item into a widget based on the type of item it is.
+                        itemBuilder: (context, index) {
+                          final item = _searchResult.length != 0 ||
+                                  controller.text.isNotEmpty
+                              ? _searchResult[index]
+                              : items[index];
+                          return Stack(children: [
+                            ListTile(
+                              dense: true,
+                              onTap: () => Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    // settings: RouteSettings(name: "boo"),
+                                    builder: (context) => MyDirectChatDetailPage(
+                                        sender: chatHestoryList[index],
+                                        ischatGroup: false,
+                                        isPrivetGroup: false,
+                                        newChat: false,
+                                        isChat: chatHestoryList[index].isChat,
+                                        member: chatHestoryList[index].members,
+                                        mid: chatHestoryList[index].id,
+                                        title: chatTitle(
+                                            chatHestoryList[index].name))),
+                              ),
+                              leading: item.buildLeading(context),
+                              title: item.buildTitle(context),
+                              subtitle: item.buildSubtitle(context),
+                              trailing: item.buildTrailing(context),
+                            ),
+                            chatHestoryList[index].newMessage != null
+                                ? chatHestoryList[index].newMessage
+                                    ? Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Align(
+                                          alignment: Alignment.topLeft,
+                                          child: Icon(Icons.circle,
+                                              color: Color(0xffe9a14e)),
+                                        ),
+                                      )
+                                    : Container()
+                                : Container()
+                          ]);
+                        },
+                      )),
+                ),
+              ]);
+           } })
+      );}
+    );
   }
 }
 
 /// The base class for the different types of items the list can contain.
 abstract class ListItem {
   /// The title line to show in a list item.
-  Widget buildTitle(BuildContext context, int index);
+  Widget buildTitle(BuildContext context);
 
   /// The subtitle line, if any, to show in a list item.
-  Widget buildSubtitle(BuildContext context, int index);
+  Widget buildSubtitle(BuildContext context);
 
-  Widget buildLeading(BuildContext context, int index);
+  Widget buildLeading(BuildContext context);
 
-  Widget buildTrailing(BuildContext context, int index);
+  Widget buildTrailing(BuildContext context);
 }
 
 /// A ListItem that contains data to display a message.
@@ -235,15 +234,18 @@ class MessageItem implements ListItem {
 
   MessageItem(this.item, this.isFolowing);
 
-  Widget buildLeading(BuildContext context, int index) =>
+  Widget buildLeading(BuildContext context) =>
       MembertImage(item: item);
 
-  Widget buildTitle(BuildContext context, int index) => Text(
-        item.name,
-        style: MyTheme.heading2,
-      );
+  Widget buildTitle(BuildContext context) {
+   // print(item);
+    return    Text(
+          item.name, //item[index].name,
+          style: MyTheme.heading2,
+        );
+  }
 
-  Widget buildSubtitle(BuildContext context, int index) => Text(
+  Widget buildSubtitle(BuildContext context) => Text(
       isFolowing==null?  item.lastMessage.length > 22
             ? item.lastMessage.substring(0, 22) + '..'
             : item.lastMessage == 'None'
@@ -254,7 +256,7 @@ class MessageItem implements ListItem {
         ),
       );
 
-  Widget buildTrailing(BuildContext context, int index) => Text(
+  Widget buildTrailing(BuildContext context) => Text(
       item.lastDate == 'False' || item.lastDate == null
           ? ''
           : DateFormat('yMMMd').format(DateTime.parse(item.lastDate)),
@@ -276,7 +278,7 @@ String chatTitle(str) {
 }
 
 class _CreateGruopeState extends State<CreateGruope> {
-  // var items;
+  ScrollController _controller;
   final _formKey = GlobalKey<FormState>();
   bool _autoValidate = false;
   var groupName;
@@ -286,16 +288,33 @@ class _CreateGruopeState extends State<CreateGruope> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
+    _controller = ScrollController();
+    _controller.addListener(_scrollListener);
     Folowing admin = Folowing(
         isAddmin: true,
         id: Provider.of<UserModel>(context, listen: false).user.uid,
         name: Provider.of<UserModel>(context, listen: false).user.name,
         image: 'False');
-    widget.members.add(admin);
+  // widget.members.add(admin);
+    print("member ${widget.members.length}");
     items = List.generate(
       widget.members.length,
-      (i) => MessageItem(widget.members, null),
+          (i) => MessageItem(widget.members[i], false),
     );
+    items.add(MessageItem(admin, false));
+  }
+  _scrollListener() {
+    if (_controller.offset >= _controller.position.maxScrollExtent &&
+        !_controller.position.outOfRange) {
+      setState(() {//you can do anything here
+      });
+    }
+    if (_controller.offset <= _controller.position.minScrollExtent &&
+        !_controller.position.outOfRange) {
+      setState(() {//you can do anything here
+      });
+    }
   }
 
   @override
@@ -363,21 +382,25 @@ class _CreateGruopeState extends State<CreateGruope> {
             ),
           ),
           Expanded(
-              child: ListView.separated(
-                  separatorBuilder: (context, index) => Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 12),
-                        child: Divider(
-                          color: Colors.black12,
+                child: ListView.separated(
+                    controller: _controller,
+                    shrinkWrap: true ,
+                    separatorBuilder: (context, index) => Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 12),
+                          child: Divider(
+                            color: Colors.black12,
+                          ),
                         ),
-                      ),
-                  itemCount: items.length,
-                  itemBuilder: (context, index) {
-                    final item = items[index];
-                    return ListTile(
-                      leading: item.buildLeading(context, index),
-                      title: item.buildTitle(context, index, true),
-                    );
-                  })),
+                    itemCount: items.length,
+                    itemBuilder: (context, index) {
+                      //print("type ${ widget.members[index].runtimeType}");
+                      final item = items[index];
+                      return ListTile(
+//leading:item.buildLeading(context),
+                        title: item.buildTitle(context),
+                      );
+                    }),
+              )
         ],
       ),
       backgroundColor: const Color(0xfff3f6fc),
@@ -385,7 +408,6 @@ class _CreateGruopeState extends State<CreateGruope> {
   }
 
   validateInput() {
-    // print("(${widget.members}, $groupName");
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
       Navigator.push(
@@ -400,15 +422,7 @@ class _CreateGruopeState extends State<CreateGruope> {
                   newChat: true,
                 )),
       );
-      /* Chat newChatRom = Chat(
-          name: groupName,
-          image: 'False',
-          //  isChat: widget.grupeType,
-          members: widget.members,
-          //  lastDate: DateTime.now().toString(),
-          lastMessage: '');
-      Provider.of<ChatModel>(context, listen: false).addNewChat(newChatRom);
-      Provider.of<ChatModel>(context, listen: false).getChannalsHistory();*/
+
     } else {
       setState(() {
         _autoValidate = true;
@@ -432,7 +446,7 @@ class ListUsers extends StatefulWidget {
 class _ListUsersState extends State<ListUsers> {
   bool privitGrup = false;
   bool newgruop = false;
-  List<MessageItem> items;
+  List items;
   List<bool> isChecked;
   List listFolow;
 
@@ -444,13 +458,11 @@ class _ListUsersState extends State<ListUsers> {
       (i) => MessageItem(listFolow[i],null),
     );
     isChecked = List<bool>.filled(items.length, false);
-
     super.initState();
   }
 
   @override
   void dispose() {
-    // _disposed = true;
     super.dispose();
   }
 
@@ -566,8 +578,8 @@ class _ListUsersState extends State<ListUsers> {
                   });
                 },
                 title: ListTile(
-                  leading: item.buildLeading(context, index),
-                  title: item.buildTitle(context, index),
+                  leading: item.buildLeading(context),
+                  title: item.buildTitle(context),
                 ),
               )
             : ListTile(
@@ -587,8 +599,8 @@ class _ListUsersState extends State<ListUsers> {
                     //   totalMessges=totalMessges-1<=0?0:totalMessges-1;
                   });
                 }),
-                leading: item.buildLeading(context, index),
-                title: item.buildTitle(context, index),
+                leading: item.buildLeading(context),
+                title: item.buildTitle(context),
               );
       },
     );

@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:management_app/Screen/chat/chat_info.dart';
 import 'package:management_app/bottom_bar.dart';
 import 'package:management_app/generated/I10n.dart';
-import 'package:management_app/model/app_model.dart';
 import 'package:management_app/model/channal.dart';
 import 'package:management_app/model/massege.dart';
 import 'package:management_app/model/user.dart';
@@ -52,7 +51,7 @@ class _MyDirectChatDetailPageState extends State<MyDirectChatDetailPage> {
   TextEditingController _txtController = TextEditingController();
   bool isCurrentUserTyping = false;
   ScrollController _scrollController;
-//List
+
   Timer timer;
   Chat newChatRom;
   String message = '';
@@ -61,15 +60,12 @@ class _MyDirectChatDetailPageState extends State<MyDirectChatDetailPage> {
   checkMember() {
     uid = Provider.of<UserModel>(context, listen: false).user.uid;
     if (widget.ischatGroup) {
-      //uid = Provider.of<UserModel>(context, listen: false).user.uid;
       for (var item in widget.member) {
         m.add(item.id);
       }
     } else {
-      // uid = Provider.ofwidget.member.<UserModel>(context, listen: false).user.uid;
       m.add(widget.member.id);
       m.add(uid);
-      // print('new chat ${m}');
     }
     return m;
   }
@@ -86,12 +82,12 @@ class _MyDirectChatDetailPageState extends State<MyDirectChatDetailPage> {
       createGroup();
      // setState(() {  addnewChat = true;});
     } else {
+    //myMessages = Provider.of<ChatModel>(context, listen: false).chatMasseges( widget.mid);
       getMasseges();
       timer = Timer.periodic(Duration(seconds: 5), (Timer t) {
-  if (Provider.of<NewMessagesModel>(context, listen: false).newMessages.totalNewMessages > 0) {
+      if (Provider.of<NewMessagesModel>(context, listen: false).newMessages.totalNewMessages > 0) {
         this.newDirctMassege();
-        setState(() {});
- }
+        setState(() {});}
       });
     }
   }
@@ -108,33 +104,31 @@ class _MyDirectChatDetailPageState extends State<MyDirectChatDetailPage> {
   }
 
    getMasseges() {
-    if(Provider.of<NewMessagesModel>(context, listen: false).totalm > 0){
+
+     WidgetsBinding.instance.addPostFrameCallback((_){
+       Provider.of<MassegesContent>(context, listen: false).getMassegesContext(widget.mid);
+     });
+   /* if(Provider.of<NewMessagesModel>(context, listen: false).totalm > 0){
       newDirctMassege();
     }
     else {
-    //setState(() { });
-      myMessages = Provider.of<ChatModel>(context, listen: false).chatMasseges(
-          widget.mid);
-      print("chat ms ${widget.mid} ${myMessages}");
+      myMessages = Provider.of<ChatModel>(context, listen: false).chatMasseges(widget.mid);
     }
-  }
+*/  }
 
   checkForNewsMs() async {
     newMessege = await Provider.of<NewMessagesModel>(context,
         listen: false) //.newMessages
         .newMessagesList();
 
-  if(Provider.of<NewMessagesModel>(context, listen: false).totalm>0) {
-    newDirctMassege();
+    if (Provider.of<NewMessagesModel>(context, listen: false)
+        .totalm > 0) {
+      newDirctMassege();
     }
   }
-
-
   newDirctMassege() async {
-  myMessages = await Provider.of<MassegesContent>(context, listen: false).getMassegesContent(widget.mid);
-  setState(() {
-
-  });
+  myMessages = await Provider.of<MassegesContent>(context, listen: false).getMassegesContext(widget.mid);
+  setState(() { });
   }
 
   var id;
@@ -155,7 +149,7 @@ setState(() {
 print(widget.mid);
    // myMessages= await Provider.of<ChatModel>(context).chatMasseges(id);
     //await
-    message= S.of(context).welcomems;
+    message = S.of(context).welcomems;
     _sendMessage();
     // await Provider.of<ChatModel>(context, listen: false).getChannalsHistory();
   // print(i);
@@ -276,15 +270,24 @@ print(widget.mid);
 
   @override
   Widget build(BuildContext context) {
-   // print(widget.mid);
+  //  print(widget.mid);
     return
       WillPopScope(
         onWillPop: () async=> false,
-        child: Scaffold(
-          backgroundColor: const Color(0xfff3f6fc),
-          appBar:_myDetailAppBar(),
-          body:myMessages==null? Container():buildBody(),
+        child: Consumer<MassegesContent>(
+          builder: (context,directMassege,child){
+            //print(directMassege.massegesContent);
+          //  myMessages= directMassege.getMassegesContext(widget.mid);
+            return child;
+          },
+
+          child: Scaffold(
+            backgroundColor: const Color(0xfff3f6fc),
+            appBar:_myDetailAppBar(),
+            body://myMessages==null? Container():
+            buildBody(),
     ),
+        ),
       );
 
   }
@@ -323,7 +326,7 @@ print(widget.mid);
        children: [
          widget.title == null  ?
          ContentApp(code: 'chat', style: TextStyle(color: Colors.white)) :
-         Text('${widget.title}', style: TextStyle(color: Colors.white, fontSize: 12)),
+         Expanded(child: Text('${widget.title}', style: TextStyle(color: Colors.white, fontSize: 12))),
        ],
      ),
       leading: GestureDetector(

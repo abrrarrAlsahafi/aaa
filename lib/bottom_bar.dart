@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:management_app/Screen/login_page.dart';
 import 'package:management_app/Screen/project.dart';
+import 'package:management_app/app_theme.dart';
 import 'package:management_app/model/folowing.dart';
 import 'package:management_app/widget/my_tab_bar.dart';
 import 'package:provider/provider.dart';
@@ -51,23 +52,16 @@ class _BottomBarState extends State<BottomBar>  with TickerProviderStateMixin{
     tabController.addListener(() {
       onTabChange();
     });
-    Future.delayed(Duration(seconds: 2), () {
+    Future.delayed(Duration(seconds: 5), () {
       //this._getAppTitle();
       this.checkForNewSharedLists();
-      this.config();
+    //  this.config();
     });
     timer = Timer.periodic(Duration(seconds: 5), (Timer t) {
       print('the total bottom bar $totalMessges');
       checkForNewSharedLists();
     });
   }
-
-  config() async {
-    await Provider.of<ChatModel>(context, listen: false).getChannalsHistory();
-    await Provider.of<FollowingModel>(context, listen: false)
-        .getfollowingList();
-  }
-
   checkForNewSharedLists() async {
     newMessege = await Provider.of<NewMessagesModel>(context,
         listen: false) //.newMessages
@@ -94,23 +88,18 @@ class _BottomBarState extends State<BottomBar>  with TickerProviderStateMixin{
       onWillPop: () async => false,
       child: Scaffold(
         appBar:appBar(),
-        backgroundColor: hexToColor('#F3F6FC'),
+        backgroundColor: MyTheme.kAccentColor,
         body: Column(
               children: [
                 MyTabBar(tabController: tabController),
                 Expanded(
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 20),
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(30),
-                          topRight: Radius.circular(30),
-                        )),
+                    color: MyTheme.kAccentColor,
                     child: TabBarView(
                       controller: tabController,
                       children: [
-                       ChatList(),
+                        ChatList(),
                         Projects()
                       ],
                     ),
@@ -125,6 +114,7 @@ class _BottomBarState extends State<BottomBar>  with TickerProviderStateMixin{
 
   appBar() {
     return  AppBar(
+      elevation: 0.5,
       backgroundColor: Color(0xff336699),
       leading: IconButton(icon: Icon(Icons.menu_outlined,color: Colors.white), onPressed:() => Navigator.pushNamed(context, '/d'),
     ),
@@ -137,7 +127,6 @@ class _BottomBarState extends State<BottomBar>  with TickerProviderStateMixin{
               .user
               .name}")),
       actions: <Widget>[
-
             IconButton(
               icon: Icon(
                 Icons.search,

@@ -20,23 +20,27 @@ class MyTheme {
 
   static final TextStyle heading2 = TextStyle(
     color: Colors.black,
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: FontWeight.bold,
   );
 
   static final TextStyle chatSenderName = TextStyle(
-    color: Colors.white,
-    fontSize: 24,
+    color: Colors.black38,
+    fontSize: 18,
     fontWeight: FontWeight.bold,
-    letterSpacing: 1.5,
+    //letterSpacing: 1.5,
   );
 
   static final TextStyle bodyText1 = TextStyle(
       color: MyTheme.kPrimaryColorVariant,
-      fontSize: 22,
+      fontSize: 18,
       //letterSpacing: 1.2,
       fontWeight: FontWeight.bold);
-
+  static final TextStyle bodyText2= TextStyle(
+      color: Colors.black87,
+      fontSize: 14,
+      //letterSpacing: 1.2,
+      fontWeight: FontWeight.bold);
   static final TextStyle bodyTextMessage =
       TextStyle(fontSize: 13, letterSpacing: 1.5, fontWeight: FontWeight.w600);
 
@@ -44,6 +48,5 @@ class MyTheme {
     color: Color(0xffAEABC9),
     fontSize: 11,
     fontWeight: FontWeight.bold,
-    letterSpacing: 1,
   );
 }

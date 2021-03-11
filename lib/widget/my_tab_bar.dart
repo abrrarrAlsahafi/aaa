@@ -23,9 +23,8 @@ class MyTabBar extends StatelessWidget {
       child: TabBar(
         controller: tabController,
         labelPadding: EdgeInsets.zero,
+        indicatorColor: MyTheme.kUnreadChatBG,
 
-        //shape: UnderlineInputBorder(),
-        indicatorColor: Colors.white,
         tabs: [
           Tab(
 
@@ -36,14 +35,8 @@ class MyTabBar extends StatelessWidget {
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-
-                    //  Expanded(child: SizedBox(height: 1)),
-                    //  Stack(
-                    // children: [
                     Icon(Icons.chat, color: Colors.white,size: 23),
 
-                    //
-                    // Expanded(child: SizedBox(height: 1)),
                     ContentApp(
                       code: "chat",
                       style: TextStyle(

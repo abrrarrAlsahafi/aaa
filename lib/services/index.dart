@@ -21,6 +21,8 @@ abstract class BaseServices {
   Future<List<Folowing>> getfollowingList();
   Future<List<Task>> getUserTask(id);
   Future<NewMessages> newMasseges();
+  Future<void> assignTask();
+
 }
 
 class Services implements BaseServices {
@@ -80,5 +82,11 @@ class Services implements BaseServices {
   Future sginOut({username, password}) {
     // TODO: implement sginOut
     throw serviceApi.sginOut();
+  }
+
+  @override
+  Future<void> assignTask() {
+    // TODO: implement assignTask
+    throw serviceApi.assignTask();
   }
 }

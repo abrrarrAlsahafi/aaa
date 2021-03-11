@@ -64,7 +64,10 @@
   "projectTask":"Task",
   "description":"Description",
   "assignedTo":"Assigned To",
-  "addTask": "Add New Task",
-  "welcomems": "Welcome\n new buddy! We are sure that you will prove to be a great addition to our team Hello"
+  "addTask": "Add New Task to",
+  "welcomems": "Welcome\n new buddy! We are sure that you will prove to be a great addition to our team Hello",
+  "addMember": "ِAdd Participants",
+  "progectManeger": "Project Manager"
+
 }
 

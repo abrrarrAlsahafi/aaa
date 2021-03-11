@@ -57,13 +57,13 @@ class FollowingModel extends ChangeNotifier {
   }
 
   channalAdmins(adminId) {
-    for (int i = 0; i < followList.length; i++) {
-      if (followList[i].id == adminId) {
+    followList.forEach((element) {
+      if (element.id == adminId) {
         //print('adminId');
-        isAdmin = followList[i];
-        channalMember.add(followList[i]);
+        isAdmin = element;
+        channalMember.add(element);
       }
-    }
+    });
     return isAdmin;
   }
 

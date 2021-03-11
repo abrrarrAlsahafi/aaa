@@ -41,15 +41,15 @@ class MassegesContent extends ChangeNotifier {
   MassegesContent();
   get masseges=>massegesContent.last;
 
-  getMassegesContent(mid) async {
-    massegesContent=await EmomApi().getMassegesContent(mid);
+  getMassegesContext(mid) async {
+    massegesContent=await EmomApi().getMassegesContext(mid);
    return massegesContent;
    //await EmomApi().getMassegesContent(mid);
   }
 
   gitAllMessagees(context){
    Provider.of<ChatModel>(context, listen: false).chatsList.forEach((element) async {
-     element.massegContex= await getMassegesContent(element.id);
+     element.massegContex= await getMassegesContext(element.id);
   //print("masseges .${element.id}\n. ${element.massegContex}");
    });
 }

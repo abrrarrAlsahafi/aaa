@@ -10,21 +10,29 @@ class MembersList extends StatefulWidget {
   List member;
   var admin;
 
-  MembersList({Key key, @required this.member, this.admin}) : super(key: key);
+  MembersList({Key key, this.member, this.admin}) : super(key: key);
 
   @override
   _MembersListState createState() => _MembersListState();
 }
 
 class _MembersListState extends State<MembersList> {
-  List<ListItem> items;
+  List<MessageItem> items;
+  bool isChckList=false;
+  List<bool> isChecked ;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    if (widget.member.isEmpty) {
-      widget.member = Provider.of<FollowingModel>(context).followList;
+    if (widget.member==null) {
+      widget.member = Provider.of<FollowingModel>(context, listen: false).followList;
+      isChckList = true;
+      items = List.generate(
+          widget.member.length,
+              (i) => MessageItem(
+            widget.member[i], false));
+      isChecked = List<bool>.filled(items.length, false);
     } else {
       items = List.generate(
           widget.member.length,
@@ -40,7 +48,7 @@ class _MembersListState extends State<MembersList> {
 
   @override
   Widget build(BuildContext context) {
-    final title = 'Members';
+  //  final title = 'Members';
     return Expanded(
       child: Container(
                 // backgroundColor: const Color(0xfff3f6fc),
@@ -58,11 +66,13 @@ class _MembersListState extends State<MembersList> {
                   // Convert each item into a widget based on the type of item it is.
                   itemBuilder: (context, index) {
                       final item = items[index];
-                      return ListTile(
+                      return
+                      ListTile(
+                        // onTap: isChckList?()=>addMember():(){},
                         dense: true,
-                        leading: item.buildLeading(context, index),
-                        title: item.buildTitle(context, index),
-                        subtitle: item.buildSubtitle(context,index),
+                        leading: item.buildLeading(context),
+                        title: item.buildTitle(context),
+                        subtitle: item.buildSubtitle(context),
                       );
                   },
                 ),
@@ -70,47 +80,17 @@ class _MembersListState extends State<MembersList> {
 
     );
   }
+
+  List userSelected() {
+    List usersSelected = List();
+    for (int i = 0; i < items.length; i++) {
+      // print("${isChecked[i]}, $i");
+      if (isChecked[i]) {
+        // print(items[i].chatslist[i]);
+        usersSelected.add(items[i].item); //.chatslist[i]);
+      }
+    }
+    return usersSelected;
+  }
+
 }
-/*
-/// The base class for the different types of items the list can contain.
-abstract class ListItem {
-  /// The title line to show in a list item.
-  Widget buildTitle(BuildContext context, int index);
-
-  /// The subtitle line, if any, to show in a list item.
-  Widget buildSubtitle(BuildContext context);
-
-  Widget buildLeading(BuildContext context, int index);
-}
-
-/// A ListItem that contains data to display a message.
-class MessageItem implements ListItem {
-  final sender;
-  //final body;
-  final isFolowing;
-
-  MessageItem(this.sender,// this.body,
-      this.isFolowing);
-
-  Widget buildLeading(BuildContext context, int index) => ClipRRect(
-      borderRadius: BorderRadius.circular(50.0),
-      child: MembertImage(
-       // index: index,
-        item: sender,
-      )
-      // : Container(),
-      );
-
-  Widget buildTitle(BuildContext context, int index) => Text(
-        // isFolowing ?
-        sender.name, //: members[index],
-        style: TextStyle(),
-      );
-
-  Widget buildSubtitle(BuildContext context) => Text(
-        isFolowing ? 'admin' : "",
-        style: TextStyle(
-            color: const Color(0xff336699), fontWeight: FontWeight.w300),
-      );
-}
-*/

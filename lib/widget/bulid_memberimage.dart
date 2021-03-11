@@ -11,46 +11,33 @@ class MembertImage extends StatelessWidget {
   const MembertImage({Key key, this.item}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return  buildImage( item);
+    return buildImage(item);
   }
-  buildImage( item) {
+  buildImage(item) {
+   // print('item run type ${item.runtimeType}');
     if(item.runtimeType==Folowing){
-      var str = item.image.toString().substring(2,item.image.toString().length - 1);
-      str = base64.normalize(str);
-      return Container(
-          width:50,
-          height: 50,
-          decoration: BoxDecoration(
-              image: DecorationImage(
-                  image: Image.memory(
-                    base64.decode(str),
-                    fit: BoxFit.cover,
-                    height: 44,
-                    width: 44,
-                  ).image,
-                  fit: BoxFit.fill
-              ),
-          shape: BoxShape.circle),
-      );
+        if(item.image=='False') falseImage();
+        else{
+          var str = item.image.toString().substring(2,item.image.toString().length - 1);
+          str = base64.normalize(str);
+          return Container(
+            width:50,
+            height: 50,
+            decoration: BoxDecoration(
+                image: DecorationImage(
+                    image: Image.memory(
+                      base64.decode(str),
+                      fit: BoxFit.cover,
+                      height: 44,
+                      width: 44,
+                    ).image,
+                    fit: BoxFit.fill
+                ),
+                shape: BoxShape.circle),
+          );
+        }
     }else{
-    if (item.image == 'False') {
-      return Container(
-        width: 200,
-        height: 200,
-        decoration: BoxDecoration(
-         //border: BoxBorder.,
-          shape: BoxShape.circle,
-         border: Border.all(color: Colors.white),
-          image: DecorationImage(
-              image:Image.asset(
-                'assets/images/iodoo.png',
-                fit: BoxFit.cover,
-              ).image,// NetworkImage('https://googleflutter.com/sample_image.jpg'),
-             // fit: BoxFit.fill
-          ),
-        ),
-      );
-    }
+    if (item.image == 'False') falseImage();
     if(item.isChat){
       return Container(
         width: 50,
@@ -87,7 +74,25 @@ class MembertImage extends StatelessWidget {
           ),
         ),
       );
-
     }}
+  }
+
+  falseImage(){
+    return Container(
+      width: 40,
+      height: 40,
+      decoration: BoxDecoration(
+        //border: BoxBorder.,
+        shape: BoxShape.circle,
+        border: Border.all(color: Colors.white),
+        image: DecorationImage(
+          image:Image.asset(
+            'assets/images/iodoo.png',
+            fit: BoxFit.cover,
+          ).image,// NetworkImage('https://googleflutter.com/sample_image.jpg'),
+          // fit: BoxFit.fill
+        ),
+      ),
+    );
   }
 }

@@ -1,9 +1,12 @@
 import 'package:management_app/Screen/tasks.dart';
+import 'package:management_app/app_theme.dart';
 import 'package:management_app/common/constant.dart';
 import 'package:management_app/generated/I10n.dart';
 import 'package:management_app/model/meettings.dart';
+import 'package:management_app/model/project.dart';
 import 'package:management_app/model/task.dart';
 import 'package:management_app/model/user.dart';
+import 'package:management_app/widget/content_translate.dart';
 import 'package:management_app/widget/textfild_wedjet.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -25,11 +28,12 @@ class _CreateMeetingsState extends State<CreateMeetings> {
   Task _task=Task();
   String _selectedItem;
   List<DropdownMenuItem<String>> _dropdownMenuItems;
-
+String projectName;
   List<String>_dropdownItems=List();
   _CreateMeetingsState();
   void initState() {
     super.initState();
+    projectName=Provider.of<ProjectModel>(context,listen: false).nameOfProject(widget.projectid);
     //_dropdownItems=['Project X','Project B'];
    // _dropdownMenuItems = buildDropDownMenuItems(_dropdownItems);
    // _selectedItem=_dropdownMenuItems[0].value;
@@ -53,7 +57,14 @@ class _CreateMeetingsState extends State<CreateMeetings> {
     final focus = FocusScope.of(context);
 
     return Scaffold(
-        appBar: AppBar(title: Text('Add meeting')),
+        appBar: AppBar(title: Row(
+          children: [
+            ContentApp(
+              code: 'addTask',
+            ),
+            Text(" $projectName")
+      ],
+        )),
    backgroundColor: hexToColor('#F3F6FC'),
      body: Padding(
      padding: const EdgeInsets.all(12.0),
@@ -63,67 +74,6 @@ class _CreateMeetingsState extends State<CreateMeetings> {
        //autovalidateMode: AutovalidateMode.onUserInteraction,
        child: ListView(
          children: [
-        widget.isTask? Container(
-          decoration: BoxDecoration(
-              color: Color(0xfff3f6fc), borderRadius: BorderRadius.circular(22)),
-          padding: const EdgeInsets.all(9.0),
-            child:  DropdownButton(
-                icon: Icon(Icons.keyboard_arrow_down_rounded),
-                isExpanded: true,
-                value: _selectedItem,
-                style: TextStyle(color:Colors.black38),
-                isDense: true,
-
-                //itemHeight:500,
-                items: <String>[
-                  'Android',
-                  'IOS',
-                  'Flutter',
-                  'Node',
-                  'Java',
-                  'Python',
-                  'PHP',
-                ].map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                dropdownColor: hexToColor('#F3F6FC'),
-                hint: Text(
-                  "Please choose a Project",
-                  style: TextStyle(
-                      color: Colors.black26,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600),
-                ),
-                onChanged: (String value) {
-                  setState(() {
-                    _selectedItem = value;
-                  });
-                },
-              ),
-            ):
-           TextFormFieldWidget(
-             textInputAction: TextInputAction.next,
-             onEditingComplete: () => focus.nextFocus(),
-             keyboardType: TextInputType.text,
-           onChanged: (str) {
-             setState(() {
-               _autoValidate=false;
-             });
-           },
-
-           validator: (value) {
-             if (value.isEmpty) {
-               return S.of(context).empty;
-             }
-           },
-           onSave: (String value) {
-            widget.isTask? _task.project=value: _meettingsModel.title = value;
-           },
-             hintText:widget.isTask? S.of(context).projectTitle: S.of(context).title,
-       ),
            TextFormFieldWidget(
              keyboardType: TextInputType.text,
              textInputAction: TextInputAction.next,
@@ -162,7 +112,7 @@ class _CreateMeetingsState extends State<CreateMeetings> {
                }
              },
              onSave: (String value) {
-               widget.isTask? _task.desc=value:
+              // widget.isTask? _task.desc=value:
                _meettingsModel.date = value;
              },
                hintText:widget.isTask?S.of(context).description:S.of(context).date,
@@ -170,7 +120,7 @@ class _CreateMeetingsState extends State<CreateMeetings> {
                    onTap: (){},
                    child:Icon(Icons.calendar_today))
            ),
-           (Provider.of<UserModel>(context).user.isAdmin)?
+         /*  (Provider.of<UserModel>(context).user.isAdmin)?
            TextFormFieldWidget(
              textInputAction: TextInputAction.next,
              onEditingComplete: () => focus.nextFocus(),
@@ -192,7 +142,7 @@ class _CreateMeetingsState extends State<CreateMeetings> {
            Container(
              padding: EdgeInsets.symmetric(horizontal: 9, vertical: 18),
              child:  Text('Assigned To\n ${(Provider.of<UserModel>(context).user.name)}', style: TextStyle(fontSize: 16,color: Colors.black),),
-           ),
+           ),*/
            widget.isTask? Container():TextFormFieldWidget(
              textInputAction: TextInputAction.next,
              onEditingComplete: () => focus.nextFocus(),
@@ -279,7 +229,6 @@ class _CreateMeetingsState extends State<CreateMeetings> {
                    onTap: (){},
                    child:Icon(Icons.add))
            ),
-
          ],
        ),
      ),
@@ -289,7 +238,7 @@ class _CreateMeetingsState extends State<CreateMeetings> {
         onPressed: () async {  if (_formKey.currentState.validate()) {
           _formKey.currentState.save();
           if(widget.isTask){
-            _task.state='New';
+            //_task.taskStage='New';
            // print(_task.toString());
               taskList.add(_task);
               expandList.add(false);

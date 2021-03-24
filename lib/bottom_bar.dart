@@ -6,10 +6,12 @@ import 'package:management_app/app_theme.dart';
 import 'package:management_app/model/folowing.dart';
 import 'package:management_app/widget/my_tab_bar.dart';
 import 'package:provider/provider.dart';
+import 'Screen/board.dart';
 import 'Screen/chat/chat_list.dart';
 import 'Screen/tasks.dart';
 import 'common/constant.dart';
 import 'generated/I10n.dart';
+import 'model/app_model.dart';
 import 'model/channal.dart';
 import 'model/massege.dart';
 import 'model/user.dart';
@@ -17,6 +19,7 @@ import 'route.dart';
 
 class BottomBar extends StatefulWidget {
   const BottomBar({Key key}) : super(key: key);
+
   @override
   _BottomBarState createState() => _BottomBarState();
 }
@@ -28,10 +31,10 @@ bool search = false;
 List<RouteApp> allDestinations;
 String t1, t2, t3, t4, t5;
 bool isLoggedIn = false;
-NewMessages newMessege;
-int totalMessges = 0;
+//NewMessages newMessege;
+int totalMessges;
 
-class _BottomBarState extends State<BottomBar>  with TickerProviderStateMixin{
+class _BottomBarState extends State<BottomBar> with TickerProviderStateMixin {
   String nameUser;
   Timer timer;
   String s;
@@ -48,28 +51,73 @@ class _BottomBarState extends State<BottomBar>  with TickerProviderStateMixin{
   @override
   void initState() {
     super.initState();
-    tabController = TabController(length: 2, vsync: this);
+    AppModel().config(context);
+    tabController = TabController(length: 3, vsync: this);
     tabController.addListener(() {
       onTabChange();
     });
     Future.delayed(Duration(seconds: 5), () {
-      //this._getAppTitle();
       this.checkForNewSharedLists();
-    //  this.config();
     });
     timer = Timer.periodic(Duration(seconds: 5), (Timer t) {
-      print('the total bottom bar $totalMessges');
       checkForNewSharedLists();
+      print('the total bottom bar $totalMessges');
     });
   }
+
+/*
+  @override
+  void setState(fn) {
+    if (mounted) {
+      super.setState(fn);
+    }
+  }
+*/
+
   checkForNewSharedLists() async {
-    newMessege = await Provider.of<NewMessagesModel>(context,
-        listen: false) //.newMessages
+    // WidgetsBinding.instance.addPostFrameCallback((_) async {
+    totalMessges = await Provider.of<NewMessagesModel>(context, listen: false)
         .newMessagesList();
-    setState(() {
+    if (mounted) {
+      setState(() {});
+    }
+
+
+    if(totalMessges>0){
+      getnewMasseges();
+    }
+
+    // });
+    /* newMessege = await Provider.of<NewMessagesModel>(context, listen: false).newMessagesList();
+   setState(() {
       totalMessges = newMessege.totalNewMessages;
-    });
+  });*/
   }
+
+
+  getnewMasseges() {
+    checkForNewSharedLists();
+    if (Provider.of<NewMessagesModel>(context, listen: false).newMessages.totalNewMessages > 0) {
+      List<ChannelMessages> newMsList = Provider.of<NewMessagesModel>(context, listen: false).newMessages.channelMessages;
+      newMsList.forEach((element) {
+        Provider.of<ChatModel>(context,listen: false).chatsList.forEach((e) {
+          if (e.id == element.channelId) {
+            e.newMessage = true;
+            e.lastMessage = element.lastMessage;
+            e.lastDate = element.lastDate;
+            Provider.of<ChatModel>(context, listen: false).orderByLastAction();
+
+          }
+          else {
+            e.newMessage = false;
+            Provider.of<ChatModel>(context, listen: false).orderByLastAction();
+          }
+        });
+
+      });
+    }
+  }
+
 
   @override
   void dispose() {
@@ -83,70 +131,81 @@ class _BottomBarState extends State<BottomBar>  with TickerProviderStateMixin{
 
   @override
   Widget build(BuildContext context) {
-    return isLoggedIn
-        ? WillPopScope(
-      onWillPop: () async => false,
-      child: Scaffold(
-        appBar:appBar(),
-        backgroundColor: MyTheme.kAccentColor,
-        body: Column(
-              children: [
-                MyTabBar(tabController: tabController),
-                Expanded(
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
-                    color: MyTheme.kAccentColor,
-                    child: TabBarView(
-                      controller: tabController,
-                      children: [
-                        ChatList(),
-                        Projects()
-                      ],
-                    ),
+    return WillPopScope(
+        onWillPop: () async => false,
+        child: Scaffold(
+            appBar: appBar(),
+            backgroundColor: MyTheme.kAccentColor,
+            body: FutureBuilder<void>(builder: (context, asyncProduct) {
+              if (asyncProduct.hasError || totalMessges == null) {
+                return Center(
+                  child: CircularProgressIndicator(
+                    backgroundColor: Color(0xff336699),
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                   ),
-                )
-              ],
-
-      ),
-    ))
-        : LoginPage();
+                );
+              } else {
+                return   Column(
+                    children: [
+                      MyTabBar(
+                          tabController: tabController,
+                          totalmassege: totalMessges == null
+                              ? 0
+                              : totalMessges),
+                      Expanded(
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: MediaQuery
+                              .of(context)
+                              .size
+                              .width / 60),
+                          color: MyTheme.kAccentColor,
+                          child: TabBarView(
+                            controller: tabController,
+                            children: [ChatList(),Projects(),BoardScreen()],
+                          ),
+                        ),
+                      )
+                    ],
+                    //)))
+                  );
+              }
+            })));
   }
-
   appBar() {
-    return  AppBar(
+    return AppBar(
       elevation: 0.5,
-      backgroundColor: Color(0xff336699),
-      leading: IconButton(icon: Icon(Icons.menu_outlined,color: Colors.white), onPressed:() => Navigator.pushNamed(context, '/d'),
-    ),
+      backgroundColor:Colors.white, //Color(0xff336699),
+      leading: IconButton(
+        icon: Icon(Icons.menu_outlined, color:MyTheme.kPrimaryColorVariant //Colors.white
+        ),
+        onPressed: () => Navigator.pushNamed(context, '/d'),
+      ),
       automaticallyImplyLeading: false,
       title: Align(
           alignment: Alignment.topLeft,
-          child:
-          Text("${Provider
+          child: Text("${Provider
               .of<UserModel>(context)
               .user
-              .name}")),
+              .name}",style: TextStyle(color: MyTheme.kPrimaryColorVariant),)),
       actions: <Widget>[
-            IconButton(
-              icon: Icon(
-                Icons.search,
-                color: Colors.white,
-              ),
-              onPressed: () {
-                setState(() {
-                  search=search?false:true;
-                //  serchTask=serchTask?
-                });
-              },
-            )
+        IconButton(
+          icon: Icon(
+            Icons.search,
+            color: MyTheme.kPrimaryColorVariant//Colors.white,
+          ),
+          onPressed: () {
+            setState(() {
+              search = search ? false : true;
+              //  serchTask=serchTask?
+            });
+          },
+        )
       ],
-
     );
   }
+
+
+  String getInitials(String n) {
+    return n.toString().substring(0, 2);
+  }
 }
-
-String getInitials(String n) {
-
-  return n.toString().substring(0, 2);
-}
-

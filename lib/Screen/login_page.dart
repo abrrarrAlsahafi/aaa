@@ -32,6 +32,8 @@ class _LoginPageState extends State<LoginPage> {
   Timer timer;
   User model = User();
   String error = '';
+  TextEditingController emailController; //= TextEditingController()..text = 'Your initial value';
+  TextEditingController passController;
   void _toggle() {
     setState(() {
       _obscureText = !_obscureText;
@@ -45,6 +47,7 @@ class _LoginPageState extends State<LoginPage> {
       isoffline=false;
     });
     });
+    rememberMe();
     super.initState();
   }
   @override
@@ -55,8 +58,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return
-      Scaffold(
+    return Scaffold(
         backgroundColor: const Color(0xfff3f6fc),
         body: ListView(
             children: <Widget>[
@@ -77,10 +79,9 @@ class _LoginPageState extends State<LoginPage> {
                         Container(
                           width: 300.0,
                           height: 220.0,
-                          //height: MediaQuery.of(context).size.height/2.6,
                           decoration: BoxDecoration(
                             image: DecorationImage(
-                              image: const AssetImage('assets/images/bgimgs.png'),
+                              image: const AssetImage('assets/bgimgs.png'),
                               fit: BoxFit.fitWidth,
                               colorFilter: new ColorFilter.mode(
                                   Colors.black.withOpacity(0.03),
@@ -97,7 +98,7 @@ class _LoginPageState extends State<LoginPage> {
                               decoration: BoxDecoration(
                                 image: DecorationImage(
                                   image:
-                                      const AssetImage('assets/images/logo.png'),
+                                      const AssetImage('assets/logo.png'),
                                   fit: BoxFit.fill,
                                 ),
                               ),
@@ -131,14 +132,13 @@ class _LoginPageState extends State<LoginPage> {
                 Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: TextFormField(
-                 //   initialValue:  getEmail().toString()==null?'':getEmail().toString(),
-                      // autofocus: true,
                       keyboardType: TextInputType.emailAddress,
                       onChanged: (str) {
                         setState(() {
                           error = '';
                         });
                       },
+                      controller: emailController,
                       validator: (value) {
                         if (value.isEmpty)
                           return S.of(context).validationusername;
@@ -155,12 +155,11 @@ class _LoginPageState extends State<LoginPage> {
                           color: const Color(0xff336699),
                           fontSize: 12,
                         ),
-                        hintText: //str == null ?
-                            S.of(context).username, //: str,
-                        hintStyle: TextStyle(
+                        hintText:  S.of(context).username,
+                        hintStyle:model.username==null? TextStyle(
                           color: Colors.black45,
                           fontSize: 12,
-                        ),
+                        ):TextStyle(fontSize: 16),
 
                         prefixIcon: Icon(Icons.perm_identity),
                       )
@@ -170,6 +169,7 @@ class _LoginPageState extends State<LoginPage> {
                 Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: TextFormField(
+                    controller: passController,
                     obscureText: _obscureText,
                     cursorColor: const Color(0xff336699),
                     decoration: InputDecoration(
@@ -201,13 +201,12 @@ class _LoginPageState extends State<LoginPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   //crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-                    Checkbox(
+               Checkbox(
                       activeColor: MyTheme.kPrimaryColorVariant,
-                      value: _isSelected,
+                      value:_isSelected,
                       onChanged: (bool newValue) {
                         setState(() {
                           _isSelected = newValue;
-                          saveEmail(_isSelected, model.username);
                         });
                       },
                     ),
@@ -240,6 +239,7 @@ class _LoginPageState extends State<LoginPage> {
       _formKey.currentState.save();
       dynamic result =
           await EmomApi().login(username: model.username, password: model.pass);
+      print('${result}');
       if (result.runtimeType != User) {
         if(result.toString().contains('Failed host')){
           setState(() {
@@ -260,12 +260,13 @@ class _LoginPageState extends State<LoginPage> {
           isLoggedIn = true;
         });
 
-       AppModel().config(context);
         Navigator.of(context).pushNamed('/a');
 
         //  Navigator.push(context, new MaterialPageRoute(builder: (context) => BottomBar()));
         if (_isSelected) {
-          // saveEmail(model.username);
+          saveEmail(model);
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          prefs.setBool('remember', true);
         }
       }
     }
@@ -296,16 +297,36 @@ class _LoginPageState extends State<LoginPage> {
       );
   }
 
-  Future<void> saveEmail(bool saved, email) async {
-    if(email!=null){
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.setString('email',email);
-    }
+  Future<void> saveEmail(User email) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    // if(saved) {
+      if (email.username != null) {
+        // prefs = await SharedPreferences.getInstance();
+        prefs.setString('email', email.username);
+      }
+      if (email.pass != null) {
+        // prefs = await SharedPreferences.getInstance();
+        prefs.setString('pass', email.pass);
+      }
+      print('email... ${prefs.get('email')}');
+
   }
- Future<String> getEmail() async {
-   if(email!=null){
-     SharedPreferences prefs = await SharedPreferences.getInstance();
-     return prefs.getString('email'); }
-    //return email==null?'':email;
+
+
+  rememberMe() async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+   if(prefs.getBool('remember')==null?false:prefs.getBool('remember')){
+     model.username= prefs.get('email');
+     model.pass= prefs.get('pass');
+     emailController=TextEditingController()..text = model.username;
+     passController=TextEditingController()..text = model.pass;
+     _isSelected=true;
+     setState((){});
+
+   }
+//print(model.username);
+  // return prefs.getBool('remember');
   }
+
 }

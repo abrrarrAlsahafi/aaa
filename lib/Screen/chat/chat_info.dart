@@ -8,16 +8,13 @@ import 'package:management_app/widget/content_translate.dart';
 import 'package:management_app/widget/flat_action_botton_wedget.dart';
 import 'package:management_app/Screen/chat/chat_list.dart';
 import 'package:provider/provider.dart';
-
-import '../../app_theme.dart';
 import '../member_list.dart';
 
 class ChatInfo extends StatefulWidget {
   final channalId;
   final sender;
-  final groupchat;
 
-  ChatInfo({Key key, this.sender, this.groupchat, this.channalId})
+  ChatInfo({Key key, this.sender, this.channalId})
       : super(key: key);
 
   @override
@@ -33,9 +30,7 @@ class _ChatInfoState extends State<ChatInfo> {
   void initState() {
     super.initState();
     if (widget.channalId == null) {
-      //widget.sender=
-    //  members=List.generate(3, (index) => Folowing(image: 'False',id: 12,name: 'abrar', isAddmin: false));
-      print("is chat ${widget.sender.isChat}");
+         print("is chat ${widget.sender.isChat}");
     } else {
       buildItem(context);
     }
@@ -47,55 +42,61 @@ class _ChatInfoState extends State<ChatInfo> {
    // print(      Provider.of<ChatModel>(context, listen: false).isChat(widget.channalId));
     return Scaffold(
       backgroundColor: const Color(0xfff3f6fc),
-      body: Column(
-        children: [
-          Container(
-            height: 230,
-            width: MediaQuery.of(context).size.width,
-            color: hexToColor('#336699'),
-            child: Column(
-              children: [
-                SizedBox(height: 22),
-                Align(
-                    alignment: Alignment.centerLeft,
-                    child: IconButton(
-                      icon: Icon(
-                        Icons.arrow_back_ios,
-                        color: Colors.white,
-                        size: 18,
-                      ),
-                      onPressed: () => Navigator.of(context).pop(),
-                    )),
-                Expanded(
-                    child: SizedBox(
-                  height: 12,
-                )),
-                Container(
-                  height: 100,
-                  width: 100,
-                  //borderRadius: BorderRadius.circular(33.0),
-                  child: ClipRRect(
-                      borderRadius: BorderRadius.circular(50.0),
-                      child: MembertImage(item: widget.sender)),
-                ),
-                SizedBox(height: 12),
-                // Image.memory()
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Text(
-                    widget.sender.name.toString(),
-                    style: TextStyle(fontSize: 33, color: Colors.white),
+      body: Container(
+     //   padding: EdgeInsets.all(MediaQuery.of(context).size.height/22),
+        child: Column(
+          children: [
+            Container(
+              height: MediaQuery.of(context).size.height/2.3,
+              width: MediaQuery.of(context).size.width,
+              color: hexToColor('#336699'),
+              child: Column(
+                children: [
+                 // SizedBox(height: MediaQuery.of(context).size.height/12),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 22,left: 8),
+                    child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: IconButton(
+                          icon: Icon(
+                            Icons.arrow_forward_ios,
+                            color: Colors.white,
+                            size: 18,
+                          ),
+                          onPressed: () => Navigator.of(context).pop(),
+                        )),
                   ),
-                ),
-              ],
+                  Expanded(
+                      child: SizedBox(
+                    height: 12,
+                  )),
+                  Container(
+                    height: 100,
+                    width: 100,
+                    //borderRadius: BorderRadius.circular(33.0),
+                    child: ClipRRect(
+                        borderRadius: BorderRadius.circular(50.0),
+                        child: MembertImage(item: widget.sender)),
+                  ),
+                  SizedBox(height: 12),
+                  // Image.memory()
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Text(
+                      widget.sender.name.toString(),
+                      style: TextStyle(fontSize: 33, color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          widget.sender.isChat
-              ? Container()
-              : MembersList(member: members, admin: widget.sender.adminId)
-        ],
+            widget.sender.isChat
+                ? Container()
+                : MembersList(member: members, admin: widget.sender.adminId)
+          ],
+        ),
       ),
-      floatingActionButton:Provider.of<ChatModel>(context, listen: false).isChat(widget.channalId)
+      floatingActionButton:widget.sender.isChat//Provider.of<ChatModel>(context, listen: false).isChat(widget.channalId)
         ?Container() :
       FlatActionButtonWidget(
             onPressed:(){
@@ -111,7 +112,8 @@ class _ChatInfoState extends State<ChatInfo> {
   }
 
   buildItem(context) {
-    var membersid = Provider.of<ChatModel>(context, listen: false).getChannalInformation(widget.channalId);//.getChatInfo(widget.channalId,context);
+    var membersid = Provider.of<ChatModel>(context, listen: false).getChannalInformation(widget.channalId);
+    //.getChatInfo(widget.channalId,context);
        // widget.sender.members != null ? widget.sender.members : widget.sender;
     members = Provider.of<FollowingModel>(context, listen: false)
         .getMembersChat(membersid, widget.sender.adminId);
@@ -157,7 +159,7 @@ class _ChatInfoState extends State<ChatInfo> {
                                     right: 200, top: 12),
                                 child: ContentApp(
                                   code: '$title',
-                                  style: MyTheme.chatSenderName,),
+                                  style: TextStyle(fontSize: 22 , color: Colors.black26)),
                               ),
                               Expanded(
                                 child: Padding(
@@ -189,23 +191,23 @@ class _ChatInfoState extends State<ChatInfo> {
                                   ),
                                 ),
                               ),
-                              Padding(
-                                padding: const EdgeInsets.all(22.0),
-                                child: ButtonWidget(
-                                    child: ContentApp(
-                                      code: '$title',
-                                      style: MyTheme.kAppTitle,
-                                    ),
-                                    //   icon: Icons.check_circle_rounded,
-                                    onPressed: () async {
-                                      List member = userSelected(items, isChecked);
-                                      await Provider.of<ChatModel>(context, listen: false).addMember(widget.channalId, member);
-                                      Provider.of<ChatModel>(context,listen: false).getChannalInformation(widget.channalId);
-                                      Navigator.of(context).pop();
-                                      buildItem(context);
-                                    }
-                                ),
-                              )
+                               Padding(
+                                 padding: EdgeInsets.symmetric(horizontal: 22),
+                                 child: ButtonWidget(
+                                      child: ContentApp(
+                                        code: '$title',
+                                        style:TextStyle(fontSize: 16,color: Colors.white),
+                                      ),
+                                      //   icon: Icons.check_circle_rounded,
+                                      onPressed: () async {
+                                        List member = userSelected(items, isChecked);
+                                        await Provider.of<ChatModel>(context, listen: false).addMember(widget.channalId, member);
+                                        Provider.of<ChatModel>(context,listen: false).getChannalInformation(widget.channalId);
+                                        Navigator.of(context).pop();
+                                        buildItem(context);
+                                      }
+                                  ),
+                               ),
                             ],
                           )),
                     ),

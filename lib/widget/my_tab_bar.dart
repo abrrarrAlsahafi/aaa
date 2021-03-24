@@ -9,77 +9,90 @@ class MyTabBar extends StatelessWidget {
   const MyTabBar({
     Key key,
     @required this.tabController,
+    this.totalmassege,
   }) : super(key: key);
 
   final TabController tabController;
+  final int totalmassege;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-     // margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      //padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
+      decoration: new BoxDecoration(
+        color: Colors.white, //background color of box
+
+      boxShadow: [
+      BoxShadow(
+      color: Colors.grey.withOpacity(0.5),
+      spreadRadius: 5,
+      blurRadius: 7,
+      offset: Offset(0, 3), // changes position of shadow
+    ),
+    ],
+      ),
       height: 60,
-      color: MyTheme.kPrimaryColorVariant,
+      //color: Colors.white, //MyTheme.kPrimaryColorVariant,
       child: TabBar(
         controller: tabController,
         labelPadding: EdgeInsets.zero,
         indicatorColor: MyTheme.kUnreadChatBG,
-
         tabs: [
           Tab(
-
-            child:  Stack(
+            child: Stack(
               alignment: Alignment.center,
-
               children: [
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.chat, color: Colors.white,size: 23),
-
+                    Icon(Icons.chat,
+                        color: MyTheme.kPrimaryColorVariant, size: 23),
                     ContentApp(
                       code: "chat",
                       style: TextStyle(
                         fontSize: 12,
+                        color: MyTheme.kPrimaryColorVariant,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                     //   Expanded(child: SizedBox(height: 1)),
                   ],
                 ),
-                Provider.of<NewMessagesModel>(context,listen: false).totalm>0?  Positioned(
-                  top: 0.0,
-                  left:12,
-                  right: 0.0,
-                  bottom: 27,
-                  // padding: EdgeInsets.all(12),
-                  //alignment: Alignment.center,
-                  child: //Provider.of<NewMessagesModel>(context,listen: false).totalm == 0
-                  //  ? Container()
-                  // :
-                  Container(
-                    height: 15,
-                    width: 15,
-                    decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Color(0xffe9a14e)),
-                    child: Center(
-                      child: Text(
-                        '${Provider.of<NewMessagesModel>(context,listen: false).totalm}',
-                        //  "    ${Provider.of<NewMessagesModel>(context).newMessages.totalNewMessages}",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 8,
-                            fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-                  // )
-                  // ],
-                ):Container(),
+                //Provider.of<NewMessagesModel>(context,listen: false).totalm!=-1||
+                // Provider.of<NewMessagesModel>(context,listen: false).newMessages.totalNewMessages>0||
+                totalmassege > 0
+                    ? Positioned(
+                        top: 0.0,
+                        left: 12,
+                        right: 0.0,
+                        bottom: 27,
+                        // padding: EdgeInsets.all(12),
+                        //alignment: Alignment.center,
+                        child: //Provider.of<NewMessagesModel>(context,listen: false).totalm == 0
+                            //  ? Container()
+                            // :
+                            Container(
+                          height: 15,
+                          width: 15,
+                          decoration: BoxDecoration(
+                              shape: BoxShape.circle, color: Color(0xffe9a14e)),
+                          child: Center(
+                            child: Text(
+                              '${totalmassege}',
+                              //  "    ${Provider.of<NewMessagesModel>(context).newMessages.totalNewMessages}",
+                              style: TextStyle(
+                                  color: MyTheme.kPrimaryColorVariant,
+                                  fontSize: 8,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                        // )
+                        // ],
+                      )
+                    : Container(),
               ],
             ),
-          //  icon:
+            //  icon:
           ),
           Tab(
             child: Stack(
@@ -87,20 +100,45 @@ class MyTabBar extends StatelessWidget {
               children: [
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-
                   children: [
-                    Icon(Icons.playlist_add_check_outlined, size: 25),
-
+                    Icon(Icons.playlist_add_check_outlined,
+                        color: MyTheme.kPrimaryColorVariant, size: 25),
                     ContentApp(
-                      code:"tasks",
+                      code: "tasks",
                       style: TextStyle(
                         fontSize: 12,
+                        color: MyTheme.kPrimaryColorVariant,
+
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],
                 ),
-              /*  Provider.of<NewMessagesModel>(context,listen: false).totalm>0?
+              ],
+            ),
+          ),
+          Tab(
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Image.asset('assets/boards_icon_active.png',
+                        height: 19,//Icons.playlist_add_check_outlined,
+                        color: MyTheme.kPrimaryColorVariant),
+                    SizedBox(height: 6,),
+                    ContentApp(
+                      code: "bords",
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: MyTheme.kPrimaryColorVariant,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+                /*  Provider.of<NewMessagesModel>(context,listen: false).totalm>0?
                 Positioned(
                   top: 1.0,
                   left:13,
@@ -131,7 +169,8 @@ class MyTabBar extends StatelessWidget {
                   // )
                   // ],
                 ):Container(),
-             */ ],
+             */
+              ],
             ),
           ),
         ],

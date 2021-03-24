@@ -8,14 +8,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:management_app/Screen/chat/chat_list.dart';
 import 'package:management_app/Screen/profile.dart';
 import 'package:management_app/services/index.dart';
-import 'package:management_app/widget/expanded_selection.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_widgets/responsive_widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'Screen/create_meeting.dart';
+import 'Screen/board.dart';
 import 'Screen/login_page.dart';
-import 'Screen/project.dart';
-import 'Screen/tasks.dart';
+
 import 'bottom_bar.dart';
 import 'generated/I10n.dart';
 import 'model/app_model.dart';
@@ -95,11 +93,11 @@ bool tap=false;
           ChangeNotifierProvider(create: (context) => FollowingModel([])),
           ChangeNotifierProvider(create: (context) => MassegesContent()),
           ChangeNotifierProvider(create: (context) => NewMessagesModel()),
-          ChangeNotifierProvider(create: (context) => ProjectModel([])),
-
+          ChangeNotifierProvider(create: (context) => ProjectModel()),
         ],
         child: StreamProvider<User>.value(
             value: Services().user,
+            initialData: UserModel().user,
             child: MaterialApp(
               locale: _locale, // widget.appLanguage.appLocal,
               supportedLocales: [Locale('en', 'US'), Locale('ar', 'SA')],
@@ -126,6 +124,8 @@ bool tap=false;
                 '/b': (BuildContext context) => LoginPage(),
                 '/d': (BuildContext context) => Profile(),
                 '/chat':(BuildContext context) => ChatList(),
+                //'/project':(BuildContext context) => ChatList(),
+
               },
               home:Roots(),
               localeResolutionCallback: (locale, supportedLocales) {

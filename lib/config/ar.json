@@ -16,9 +16,9 @@
   "tasks": "المهام",
   "more": "المزيد",
 
-  "bords": "الاعمال الحالية",
+  "bords": "الاعمال",
   "view all": "الكل",
-  "bord name": "اسم البورد",
+  "bord": "البورد",
   "closed":"مغلق",
   "remain": "لم ينتهى",
   "void": "ملغي",
@@ -28,8 +28,8 @@
   "canceled": "الغى",
 "yourmeeting": "اجتماعاتك",
   "new chat": "محادثة جديدة",
-  "new group": "مجموعة جديدة",
-  "private group": "مجموعة خاصة",
+  "new group": "قناة جديدة",
+  "private group": "مجموعة جديدة",
   "group name": "اسم المجموعة",
   "your board": "Your Board",
   "members": "الأعضاء",
@@ -64,9 +64,13 @@
   "projectTask": "المهمة",
   "description": "وصف للمهمة",
   "assignedTo": "تكليف",
-  "addTask": "اضف مهمة جديده الى",
+  "addTask": "مهمة جديده",
   "welcomems":  "مرحبا بك, نحن على يقين من أنك ستثبت أنك إضافة رائعة لفريقنا",
 "addMember":"اضافة الاعضاء",
-"progectManeger": "مدير المشروع"
+"progectManeger": "المدير",
+  "noTask": "لايوجد مهام يمكنك اضافة مهمة",
+
+  "editor": "محرر",
+  "approval": "Approval"
 
 }

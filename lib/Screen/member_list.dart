@@ -1,5 +1,4 @@
 import 'package:management_app/model/folowing.dart';
-import 'package:management_app/widget/bulid_memberimage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

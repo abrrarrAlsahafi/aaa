@@ -15,8 +15,7 @@ abstract class BaseServices {
   });
 
   Future<dynamic> login({username, password});
-  Future<dynamic> sginOut({username, password});
-
+  Future<void> logOut({username, password});
   Future<dynamic> chatHistory();
   Future<List<Folowing>> getfollowingList();
   Future<List<Task>> getUserTask(id);
@@ -79,9 +78,9 @@ class Services implements BaseServices {
   }
 
   @override
-  Future sginOut({username, password}) {
+  Future logOut({username, password}) {
     // TODO: implement sginOut
-    throw serviceApi.sginOut();
+    throw serviceApi.logOut();
   }
 
   @override

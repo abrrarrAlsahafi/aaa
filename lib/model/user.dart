@@ -5,6 +5,9 @@ import 'package:management_app/services/index.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserModel with ChangeNotifier {
+
+  //final AuthenticationService _authenticationService = locator<AuthenticationService>();
+
   UserModel() {
     getUser();
   }

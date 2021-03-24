@@ -69,22 +69,27 @@ class _ProfileState extends State<Profile> {
   profileApp() {
     return Scaffold(
       body: Container(
+        //padding: EdgeInsets.all(33),
         height: MediaQuery.of(context).size.height,
             color: hexToColor('#336699'),
             child:Column(
                 children: [
               Padding(
-               padding: const EdgeInsets.only(top: 16),
+               padding:  EdgeInsets.only(top:MediaQuery.of(context).size.height/33),
                 child: Row(
     mainAxisAlignment: MainAxisAlignment.center,
     children: [
-    IconButton(
-    icon: Icon(
-    Icons.arrow_back_ios_rounded,
-    color: Colors.white,
-    size: 18,
-    ),
-    onPressed: () => Navigator.of(context).pop(),
+    Container(
+      height: 55,
+      width: 55,
+      child: IconButton(
+      icon: Icon(
+      Icons.arrow_back_ios_rounded,
+      color: Colors.white,
+      size: 18,
+      ),
+      onPressed: () => Navigator.of(context).pop(),
+      ),
     ), Expanded(child: SizedBox(width: 12,)),
     IconButton(
     icon: Icon(

@@ -16,7 +16,7 @@
   "more": "More",
   "bords": "Boards",
   "view all": "View all",
-  "bord name": "Board Name",
+  "bord": "Board Name",
   "your board": "Your Board",
   "yourmeeting": "Your Meeting",
   "qrcode":"QR Code",
@@ -32,8 +32,8 @@
   "canceled": "Canceled",
 
   "new chat": "New Chat",
-  "new group": "New Group",
-  "private group": "Private Group",
+  "new group": "New Channel",
+  "private group": "New Group",
   "group name": "Group Name",
 
   "generalInst": "Instruction",
@@ -64,10 +64,13 @@
   "projectTask":"Task",
   "description":"Description",
   "assignedTo":"Assigned To",
-  "addTask": "Add New Task to",
+  "addTask": "New Task",
   "welcomems": "Welcome\n new buddy! We are sure that you will prove to be a great addition to our team Hello",
-  "addMember": "ِAdd Participants",
-  "progectManeger": "Project Manager"
+  "addMember": "Add Participants",
+  "progectManeger": "Dirctor",
+"noTask": "There is no Task you can Add one",
+  "editor": "Editor",
+  "approval": "Approval"
 
 }
 

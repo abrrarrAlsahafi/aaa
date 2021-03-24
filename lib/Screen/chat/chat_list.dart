@@ -30,21 +30,24 @@ class ChatList extends StatefulWidget {
 }
 
 class _ChatListState extends State<ChatList> with TickerProviderStateMixin {
-  List<Chat> chatHestoryList = List();
+  List<Chat> chatHestoryList=List();
   TextEditingController controller = new TextEditingController();
-
+  int newmass;
   Timer timer;
   var items;
 
   @override
-  void initState() {
-     timer = Timer.periodic(Duration(seconds: 5), (Timer t) {
-      if (Provider.of<NewMessagesModel>(context, listen: false).totalm > 0) {
-        getnewMasseges();
-      }
-    });
+  Future<void> initState()  {
+    newmass=  Provider.of<NewMessagesModel>(context, listen: false).newMessages==null?0: Provider.of<NewMessagesModel>(context, listen: false).newMessages.totalNewMessages;
     super.initState();
   }
+/*
+  @override
+  void setState(fn) {
+    if (mounted) {
+      super.setState(fn);
+    }
+  }*/
 
   @override
   void dispose() {
@@ -53,32 +56,13 @@ class _ChatListState extends State<ChatList> with TickerProviderStateMixin {
   }
 
   checkForNewSharedLists() {
-    newMessege = Provider.of<NewMessagesModel>(context, listen: false).newMessages;
-    items =chatHestoryList==null?[]: List.generate(
+    items = chatHestoryList == null
+        ? []
+        : List.generate(
       chatHestoryList.length,
           (i) => MessageItem(chatHestoryList[i], false),
     );
     //setState(() {});
-  }
-
-  getnewMasseges() {
-    checkForNewSharedLists();
-    if (Provider.of<NewMessagesModel>(context, listen: false).totalm > 0) {
-      List<ChannelMessages> newMsList =
-          Provider.of<NewMessagesModel>(context, listen: false)
-              .newMessages
-              .channelMessages;
-      newMsList.forEach((element) {
-        //  setState(() {
-        chatHestoryList.forEach((e) {
-          if (e.id == element.channelId) {
-            e.newMessage = true;
-            e.lastMessage = element.lastMessage;
-            e.lastDate = element.lastDate;
-          }
-        });
-      });
-    }
   }
 
   onSearchTextChanged(String text) async {
@@ -99,119 +83,134 @@ class _ChatListState extends State<ChatList> with TickerProviderStateMixin {
 
   List _searchResult = [];
   String s = '';
-
+bool onTapSearsh=false;
   @override
   Widget build(BuildContext context) {
-    return Consumer<ChatModel>(
-        builder: (context, myCounter, _) {
-          chatHestoryList=myCounter.chatsList;
-        //  print("new provider ${myCounter.chatsList}");
-          checkForNewSharedLists();
-      //child:
-      return Scaffold(
+    return Consumer<ChatModel>(builder: (context, myCounter, _) {
+      chatHestoryList = myCounter.chatsList;
+      checkForNewSharedLists();
+      return chatHestoryList==null?Container():Scaffold(
           floatingActionButton: FlatActionButtonWidget(
             icon: Icons.chat_outlined,
-            onPressed: () => Navigator.push(
-                context, MaterialPageRoute(builder: (context) => ListUsers())),
+            onPressed: () =>
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ListUsers())),
             tooltip: 'Chat',
           ),
-          body: FutureBuilder<void>(builder: (context, asyncProduct) {
-      if (asyncProduct.hasError || chatHestoryList==null) {
-      return Center(
-      child: CircularProgressIndicator(
-      backgroundColor: Color(0xff336699),
-      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-      ),
-      );
-      } else {
-      return Column(children: [
-                search
-                    ? ListTile(
-                        leading: new Icon(Icons.search),
-                        title: new TextField(
-                          controller: controller,
-                          decoration: new InputDecoration(
-                              hintText: 'Search', border: InputBorder.none),
-                          onChanged: onSearchTextChanged,
-                        ),
-                        trailing: new IconButton(
-                          icon: new Icon(Icons.close),
-                          onPressed: () {
-                            controller.clear();
-                            onSearchTextChanged('');
-                          },
-                        ),
-                      )
-                    : Container(),
-                Expanded(
-                  child: Container(
-                      padding: EdgeInsets.symmetric(
-                          vertical: MediaQuery.of(context).size.width / 66),
-                      height: MediaQuery.of(context).size.height,
-                      child: ListView.separated(
-                        // Let the ListView know how many items it needs to build.
-                        itemCount: _searchResult.length != 0 ||
-                                controller.text.isNotEmpty
-                            ? _searchResult.length
-                            : chatHestoryList.length,
-                        //items.length,
-                        separatorBuilder: (context, index) => Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 12),
+          body: Column(children: [
+            search
+                ? ListTile(
+              leading: new Icon(Icons.search),
+              title: new TextField(
+                controller: controller,
+
+                decoration: new InputDecoration(
+                    hintText: 'Search', border: InputBorder.none),
+                onChanged: onSearchTextChanged,
+              ),
+              trailing: new IconButton(
+                icon: new Icon(Icons.close),
+                onPressed: () {
+                  setState(() {
+                    search=false;
+                  });
+                  controller.clear();
+                  onSearchTextChanged('');
+                },
+              ),
+            )
+                : Container(),
+            Expanded(
+              child: Container(
+                margin: EdgeInsets.all(0.0),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 0.0,
+                      vertical: MediaQuery
+                          .of(context)
+                          .size
+                          .width / 66),
+                 //width: 444,
+                  height: MediaQuery
+                      .of(context)
+                      .size
+                      .height,
+                  child: ListView.separated(
+                    // Let the ListView know how many items it needs to build.
+                    itemCount: _searchResult.length != 0 ||
+                        controller.text.isNotEmpty
+                        ? _searchResult.length
+                        : chatHestoryList.length,
+                    //items.length,
+                    separatorBuilder: (context, index) =>
+                        Padding(
+                          padding: EdgeInsets.only(left: 12),
                           child: Divider(
                             color: Colors.black12,
                           ),
                         ),
-                        // Provide a builder function. This is where the magic happens.
-                        // Convert each item into a widget based on the type of item it is.
-                        itemBuilder: (context, index) {
-                          final item = _searchResult.length != 0 ||
-                                  controller.text.isNotEmpty
-                              ? _searchResult[index]
-                              : items[index];
-                          return Stack(children: [
-                            ListTile(
-                              dense: true,
-                              onTap: () => Navigator.pushReplacement(
+                    // Provide a builder function. This is where the magic happens.
+                    // Convert each item into a widget based on the type of item it is.
+                    itemBuilder: (context, index) {
+                      final item = _searchResult.length != 0 ||
+                          controller.text.isNotEmpty
+                          ? _searchResult[index]
+                          : items[index];
+                      return Stack(children: [
+                        ListTile(
+                          dense: true,
+                          onTap: () {
+                            chatHestoryList[index].newMessage=false;
+                           // print(chatHestoryList[index].newMessage=false);
+                              Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                    // settings: RouteSettings(name: "boo"),
-                                    builder: (context) => MyDirectChatDetailPage(
-                                        sender: chatHestoryList[index],
-                                        ischatGroup: false,
-                                        isPrivetGroup: false,
-                                        newChat: false,
-                                        isChat: chatHestoryList[index].isChat,
-                                        member: chatHestoryList[index].members,
-                                        mid: chatHestoryList[index].id,
-                                        title: chatTitle(
-                                            chatHestoryList[index].name))),
-                              ),
-                              leading: item.buildLeading(context),
-                              title: item.buildTitle(context),
-                              subtitle: item.buildSubtitle(context),
-                              trailing: item.buildTrailing(context),
-                            ),
-                            chatHestoryList[index].newMessage != null
-                                ? chatHestoryList[index].newMessage
-                                    ? Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Align(
-                                          alignment: Alignment.topLeft,
-                                          child: Icon(Icons.circle,
-                                              color: Color(0xffe9a14e)),
-                                        ),
-                                      )
-                                    : Container()
-                                : Container()
-                          ]);
-                        },
-                      )),
-                ),
-              ]);
-           } })
-      );}
-    );
+                                  // settings: RouteSettings(name: "boo"),
+                                    builder: (context) =>
+                                        MyDirectChatDetailPage(
+                                            chatDetils: chatHestoryList[index],
+                                           // ischatGroup: false,
+                                            isPrivetGroup: false,
+                                            newChat: false,
+                                            isChat: chatHestoryList[index].isChat,
+                                            //member: chatHestoryList[index].members,
+                                            mid: chatHestoryList[index].id,
+                                            title: chatHestoryList[index].name//chatTitle()
+                                        )
+                                ),
+                              );/*.then((value){
+                                setState(() {
+                                 // chatHestoryList[index].newMessage= chatHestoryList[index].newMessage?false:chatHestoryList[index].newMessage;
+                                });
+                              });*/
+                              },
+                          leading: item.buildLeading(context),
+                          title: item.buildTitle(context),
+                          subtitle: item.buildSubtitle(context),
+                          trailing: item.buildTrailing(context),
+                        ),
+                        chatHestoryList[index].newMessage != null?
+                        chatHestoryList[index].newMessage
+                            ? Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Align(
+                            alignment: Alignment.topLeft,
+                            child: Icon(Icons.circle,
+                                color: Color(0xffe9a14e)),
+                          ),
+                        )
+                            : Container()
+                            : Container()
+                      ]);
+                    },
+                  )),
+            ),
+          ]));
+
+      });//);
+   // });
   }
+
 }
 
 /// The base class for the different types of items the list can contain.
@@ -234,27 +233,35 @@ class MessageItem implements ListItem {
 
   MessageItem(this.item, this.isFolowing);
 
-  Widget buildLeading(BuildContext context) =>
-      MembertImage(item: item);
+  Widget buildLeading(BuildContext context) => MembertImage(item: item);
 
   Widget buildTitle(BuildContext context) {
-   // print(item);
-    return    Text(
-          item.name, //item[index].name,
-          style: MyTheme.heading2,
-        );
+    // print(item);
+    return Text(
+      item.name, //item[index].name,
+      style: MyTheme.heading2,
+    );
   }
 
-  Widget buildSubtitle(BuildContext context) => Text(
-      isFolowing==null?  item.lastMessage.length > 22
-            ? item.lastMessage.substring(0, 22) + '..'
-            : item.lastMessage == 'None'
-                ? ''
-                : item.lastMessage:isFolowing?'admin':'',
+  Widget buildSubtitle(BuildContext context) {
+    if (item.runtimeType == Chat) {
+      return Text(
+        item.lastMessage.toString().length > 22
+            ? item.lastMessage.toString().substring(0, 22) + '..'
+            : item.lastMessage,
         style: TextStyle(
           color: const Color(0xff336699),
         ),
       );
+    } else {
+      return Text(
+        isFolowing ? 'admin' : '',
+        style: TextStyle(
+          color: const Color(0xff336699),
+        ),
+      );
+    }
+  }
 
   Widget buildTrailing(BuildContext context) => Text(
       item.lastDate == 'False' || item.lastDate == null
@@ -277,42 +284,48 @@ String chatTitle(str) {
   return "${str[0].toUpperCase()}${str.substring(1)}";
 }
 
+
 class _CreateGruopeState extends State<CreateGruope> {
   ScrollController _controller;
   final _formKey = GlobalKey<FormState>();
   bool _autoValidate = false;
   var groupName;
-  List items;
+  List items=List();
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-
     _controller = ScrollController();
     _controller.addListener(_scrollListener);
     Folowing admin = Folowing(
         isAddmin: true,
         id: Provider.of<UserModel>(context, listen: false).user.uid,
         name: Provider.of<UserModel>(context, listen: false).user.name,
-        image: 'False');
-  // widget.members.add(admin);
+        image: widget.members[0].image);
+
+    widget.members.add(admin);
+    //widget.members.sort();
+   // items.add(MessageItem(admin, false));
     print("member ${widget.members.length}");
     items = List.generate(
       widget.members.length,
-          (i) => MessageItem(widget.members[i], false),
+      (i) => MessageItem(widget.members[i], false),
     );
-    items.add(MessageItem(admin, false));
+   //
+
   }
+
   _scrollListener() {
     if (_controller.offset >= _controller.position.maxScrollExtent &&
         !_controller.position.outOfRange) {
-      setState(() {//you can do anything here
+      setState(() {
+        //you can do anything here
       });
     }
     if (_controller.offset <= _controller.position.minScrollExtent &&
         !_controller.position.outOfRange) {
-      setState(() {//you can do anything here
+      setState(() {
+        //you can do anything here
       });
     }
   }
@@ -351,7 +364,6 @@ class _CreateGruopeState extends State<CreateGruope> {
                   groupName = value;
                 },
                 cursorColor: const Color(0xff336699),
-                // onChanged: ()=>,
                 decoration: InputDecoration(
                   focusedBorder: InputBorder.none,
                   enabledBorder: InputBorder.none,
@@ -381,29 +393,35 @@ class _CreateGruopeState extends State<CreateGruope> {
               color: Colors.black12,
             ),
           ),
-          Expanded(
-                child: ListView.separated(
-                    controller: _controller,
-                    shrinkWrap: true ,
-                    separatorBuilder: (context, index) => Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 12),
-                          child: Divider(
-                            color: Colors.black12,
-                          ),
-                        ),
-                    itemCount: items.length,
-                    itemBuilder: (context, index) {
-                      //print("type ${ widget.members[index].runtimeType}");
-                      final item = items[index];
-                      return ListTile(
-//leading:item.buildLeading(context),
-                        title: item.buildTitle(context),
-                      );
-                    }),
-              )
+          Container(
+            color: Colors.white,
+            height: 300,
+            child: ListView.separated(
+                controller: _controller,
+                shrinkWrap: true,
+                separatorBuilder: (context, index) => Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 12),
+                      child: Divider(
+                        color: Colors.black12,
+                      ),
+                    ),
+                itemCount: items.length,
+                itemBuilder: (context, index) {
+                  //print("type ${ widget.members[index].runtimeType}");
+                  final item = items[index];
+                  return Row(
+                      children: [
+                        item.buildLeading(context),
+                      item.buildTitle(context),
+                    ],
+                 //  leading:
+                   // title:
+                  );
+                }),
+          )
         ],
       ),
-      backgroundColor: const Color(0xfff3f6fc),
+    //  backgroundColor: const Color(0xfff3f6fc),
     );
   }
 
@@ -414,15 +432,14 @@ class _CreateGruopeState extends State<CreateGruope> {
         context,
         MaterialPageRoute(
             builder: (context) => MyDirectChatDetailPage(
-                  ischatGroup: true,
                   isChat: false,
                   isPrivetGroup: widget.isPrivate,
+                 // chatDetils: ,
                   member: widget.members,
                   title: groupName,
                   newChat: true,
                 )),
       );
-
     } else {
       setState(() {
         _autoValidate = true;
@@ -455,7 +472,7 @@ class _ListUsersState extends State<ListUsers> {
     listFolow = Provider.of<FollowingModel>(context, listen: false).followList;
     items = List.generate(
       listFolow.length,
-      (i) => MessageItem(listFolow[i],null),
+      (i) => MessageItem(listFolow[i], null),
     );
     isChecked = List<bool>.filled(items.length, false);
     super.initState();
@@ -520,7 +537,7 @@ class _ListUsersState extends State<ListUsers> {
                   },
                   child: TileWidget(
                     title: S.of(context).newg,
-                    icon: Icon(Icons.people_outline_rounded),
+                    icon: Icon(Icons.group_outlined),
                   ),
                 ),
           newgruop
@@ -565,7 +582,7 @@ class _ListUsersState extends State<ListUsers> {
       // Provide a builder function. This is where the magic happens.
       // Convert each item into a widget based on the type of item it is.
       itemBuilder: (context, index) {
-        //  print(isChecked.length);
+       //print(oldChat);
         final item = items[index];
         return newgruop
             ? CheckboxListTile(
@@ -583,22 +600,37 @@ class _ListUsersState extends State<ListUsers> {
                 ),
               )
             : ListTile(
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => MyDirectChatDetailPage(
-                            title: listFolow[index].name,
-                            newChat: true,
-                            member: listFolow[index],
-                            ischatGroup: false,
-                            isPrivetGroup: true,
-                            isChat: true,
-                          )),
-                ).then((value) {
-                  setState(() {
-                    //   totalMessges=totalMessges-1<=0?0:totalMessges-1;
-                  });
-                }),
+                onTap: () {
+                  int oldChat= Provider.of<ChatModel>(context,listen: false).haveChatRoom(listFolow[index].id);
+print(oldChat);
+                  if(oldChat==null) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              MyDirectChatDetailPage(
+                                chatDetils: listFolow[index],
+                                newChat: true,
+                                member: listFolow[index],
+                                // ischatGroup: false,
+                                isPrivetGroup: true,
+                                isChat: true,
+                              )),
+                    );
+                  }else {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              MyDirectChatDetailPage(
+                                mid: oldChat,
+                                chatDetils: listFolow[index],
+                                newChat: false,
+                                isChat: true,
+                                isPrivetGroup: true,
+                              )),
+                    );
+                  }},
                 leading: item.buildLeading(context),
                 title: item.buildTitle(context),
               );

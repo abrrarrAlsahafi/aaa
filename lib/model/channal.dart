@@ -32,6 +32,7 @@ class Chat {
       this.adminId,
       this.isChat});
 
+
   Chat.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['channel_name'];
@@ -71,6 +72,7 @@ class Chat {
 class ChatModel with ChangeNotifier {
   List<Chat> chatsList;
   ChatModel();
+
     getChannalsHistory() async {
     chatsList = await EmomApi().chatHistory();
     orderByLastAction();
@@ -79,7 +81,7 @@ class ChatModel with ChangeNotifier {
    orderByLastAction(){
    chatsList.sort((a,b)
    { // print('${a.lastDate} ${b.lastDate} , ${b.lastDate.compareTo(a.lastDate)}');
-      return //b.lastDate=='False' ||a.lastDate=='False'?-1:
+      return// b.dat=='None' || a.lastMessage=='None'?0:
       b.lastDate.compareTo(a.lastDate);
    });
   // notifyListeners();
@@ -88,7 +90,7 @@ class ChatModel with ChangeNotifier {
   addNewChat(chat) => chatsList.add(chat);
   createChannal(chat, isCaht, isPrivate) async {
     // chatsList.removeLast();
-  int id=  await EmomApi().createNewChannal(chat.name, chat.members, isCaht,isPrivate);
+  int id =  await EmomApi().createNewChannal(chat.name, chat.members, isCaht,isPrivate);
          await getChannalsHistory();
  // print('id new massege = $id');
   notifyListeners();
@@ -126,5 +128,21 @@ addMember(channelId,memberId) async {
     await getChannalsHistory();
 
 }
+
+  int haveChatRoom(int senderId) {
+    int ischat;
+
+    chatsList.forEach((chat) {
+     // print(chat.members);
+     if(chat.isChat) {
+        if (chat.members.first == senderId ||chat.members.last == senderId) {
+          print(chat.id);
+          ischat= chat.id;
+        }
+      }
+    });
+
+   return ischat;
+  }
 
 }

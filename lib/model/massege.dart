@@ -13,9 +13,10 @@ class Massege {
   bool isMine;
 
   Massege(this.text, this.date, this.sender, this.isMine);
+
   Massege.fromJson(Map<String, dynamic> json) {
     //print('date ${json['message_date']}');
-    date =DateTime.parse( json['message_date']);
+    date = DateTime.parse(json['message_date']);
     text = json['message_body'];
     sender = json['message_sender'];
     idSender = json['sender_id'];
@@ -34,52 +35,63 @@ class Massege {
 }
 
 class MassegesContent extends ChangeNotifier {
-  bool isNewMassege=false;
+  bool isNewMassege = false;
   List massegesContent;
 
-
   MassegesContent();
-  get masseges=>massegesContent.last;
+
+  get masseges => massegesContent.last;
 
   getMassegesContext(mid) async {
-    massegesContent=await EmomApi().getMassegesContext(mid);
-   return massegesContent;
-   //await EmomApi().getMassegesContent(mid);
+    massegesContent = await EmomApi().getMassegesContext(mid);
+    return massegesContent;
+    //await EmomApi().getMassegesContent(mid);
   }
 
-  gitAllMessagees(context){
-   Provider.of<ChatModel>(context, listen: false).chatsList.forEach((element) async {
-     element.massegContex= await getMassegesContext(element.id);
-  //print("masseges .${element.id}\n. ${element.massegContex}");
-   });
-}
+
+  gitAllMessagees(context) {
+    Provider.of<ChatModel>(context, listen: false)
+        .chatsList
+        .forEach((element) async {
+      element.massegContex = await getMassegesContext(element.id);
+      //print("masseges .${element.id}\n. ${element.massegContex}");
+    });
+  }
 }
 
 class NewMessagesModel extends ChangeNotifier {
   NewMessages newMessages;
-  ChannelMessages channelMessages;
-  int totalm=0;
+
+  // ChannelMessages channelMessages;
+  // int totalm=-1;
   NewMessagesModel();
+
   newMessagesList() async {
     newMessages = await EmomApi().newMasseges();
-    totalm=newMessages.totalNewMessages;
-    // print(newMessages.totalNewMessages);
-    return newMessages;
+    if (newMessages.totalNewMessages > 0) {
+      await EmomApi().chatHistory();
+    }
+    //sortchatlist
+    // print("total messege ${newMessages.totalNewMessages}");
+    return newMessages.totalNewMessages;
   }
 
-  isHaveNewMassge(int id) {
+  bool isHaveNewMassge(int id) {
     bool ishave = false;
     newMessages.channelMessages.forEach((element) {
       if (id == element.channelId) {
         ishave = true;
+        // totalm=totalm-1;
+        return ishave;
       }
+      // return ishave;
     });
     return ishave;
   }
 }
 
 class NewMessages {
-  int totalNewMessages;
+  int totalNewMessages=0;
   List<ChannelMessages> channelMessages;
 
   NewMessages({this.totalNewMessages, this.channelMessages});

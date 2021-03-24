@@ -3,16 +3,16 @@ import 'package:management_app/model/folowing.dart';
 import 'package:management_app/services/emom_api.dart';
 import 'package:provider/provider.dart';
 
-class Project {
+class Board {
   int id;
   String name;
   int managerId;
   String managerName;
   int noOfTask;
 
-  Project({this.id, this.name, this.managerId, this.managerName, this.noOfTask});
+  Board({this.id, this.name, this.managerId, this.managerName, this.noOfTask});
 
-  Project.fromJson(Map<String, dynamic> json) {
+  Board.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
     managerId = json['manager_id'];
@@ -29,30 +29,3 @@ class Project {
     data['no_of_task'] = this.noOfTask;
     return data;
   }}
-
-class ProjectModel with ChangeNotifier {
-  List<Project> userProject;
-  ProjectModel();
-
-  getUserProjects() async {
-    userProject= await EmomApi().getMyProjects();
-    return userProject;
-  }
-
-  taskCount(proId) async {
-   List tasks=await EmomApi().getUserTask(proId);
-    return tasks.length;
-  }
-
-  nameOfProject(pid){
-    String nameProject;//=List();
-    userProject.forEach((element) {
-    if(element.id==pid)  {
-       nameProject=element.name;
-      }
-    });
-
-    return nameProject;
-  }
-
-}

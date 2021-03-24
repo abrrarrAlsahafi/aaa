@@ -1,9 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:management_app/app_theme.dart';
+import 'package:management_app/model/channal.dart';
 import 'package:management_app/model/folowing.dart';
-import 'package:management_app/model/user.dart';
 
 class MembertImage extends StatelessWidget {
   final item;
@@ -13,86 +12,69 @@ class MembertImage extends StatelessWidget {
   Widget build(BuildContext context) {
     return buildImage(item);
   }
+
+
   buildImage(item) {
-   // print('item run type ${item.runtimeType}');
     if(item.runtimeType==Folowing){
-        if(item.image=='False') falseImage();
-        else{
+        if(item.image=='False') {
+          print("image ${item.image}");
+        return  falseImage();
+      } else{
           var str = item.image.toString().substring(2,item.image.toString().length - 1);
           str = base64.normalize(str);
           return Container(
-            width:50,
-            height: 50,
+            width:40,
+            height:40,
             decoration: BoxDecoration(
-                image: DecorationImage(
-                    image: Image.memory(
-                      base64.decode(str),
-                      fit: BoxFit.cover,
-                      height: 44,
-                      width: 44,
-                    ).image,
-                    fit: BoxFit.fill
-                ),
-                shape: BoxShape.circle),
+              image:DecorationImage(
+                image:Image(
+                  gaplessPlayback: true,
+                  image:Image.memory(
+                  base64.decode(str),
+                  fit: BoxFit.cover,
+                  height: 40,
+                  width: 40
+                ).image,
+                fit: BoxFit.cover,
+              ).image  ,
+              ),
+              borderRadius:BorderRadius.circular(33),
+                border: Border.all(color: Colors.grey[200])
+            ),
           );
         }
     }else{
-    if (item.image == 'False') falseImage();
-    if(item.isChat){
+
+    if(item.runtimeType==Chat){
+      print('item run type ${item.isChat}');
+
       return Container(
-        width: 50,
-        height: 50,
+        width: 55,
+        height: 55,
         decoration: BoxDecoration(
-          border: Border.all(color: MyTheme.kPrimaryColorVariant),
-         color:MyTheme.kPrimaryColorVariant ,
+          border: Border.all(color: Colors.grey[300]),
+         color:Colors.grey[300] ,
           shape: BoxShape.circle,
         ),
-        child:  Icon(
+        child: Icon(
           item.isChat?Icons.person:Icons.group_outlined,
           color: Colors.white,
-          size: 33,
+          size: 36,
         ),
       );
-    } else {
-      var str = item.image.toString().substring(2,item.image.toString().length - 1);
-      str = base64.normalize(str);
-      return Container(
-        width:50,
-        height: 50,
-        decoration: BoxDecoration(
-         // boxShadow: BoxShadow(color: Colors.white),
-          border: Border.all(color:Colors.white),
-          shape: BoxShape.circle,
-          image: DecorationImage(
-              image: Image.memory(
-                base64.decode(str),
-                fit: BoxFit.cover,
-                height: 44,
-                width: 44,
-              ).image,
-              fit: BoxFit.fill
-          ),
-        ),
-      );
-    }}
+    }
+    }
   }
 
   falseImage(){
     return Container(
       width: 40,
       height: 40,
+    //  child: Center(child: Icon(Icons.person, size: 33)),
       decoration: BoxDecoration(
-        //border: BoxBorder.,
+        color: Colors.grey[200],
         shape: BoxShape.circle,
-        border: Border.all(color: Colors.white),
-        image: DecorationImage(
-          image:Image.asset(
-            'assets/images/iodoo.png',
-            fit: BoxFit.cover,
-          ).image,// NetworkImage('https://googleflutter.com/sample_image.jpg'),
-          // fit: BoxFit.fill
-        ),
-      ),
+        border: Border.all(color: Colors.grey[200]))
     );
   }
 }

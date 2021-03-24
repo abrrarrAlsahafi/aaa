@@ -1,11 +1,9 @@
 import 'package:management_app/Screen/tasks.dart';
-import 'package:management_app/app_theme.dart';
 import 'package:management_app/common/constant.dart';
 import 'package:management_app/generated/I10n.dart';
 import 'package:management_app/model/meettings.dart';
 import 'package:management_app/model/project.dart';
 import 'package:management_app/model/task.dart';
-import 'package:management_app/model/user.dart';
 import 'package:management_app/widget/content_translate.dart';
 import 'package:management_app/widget/textfild_wedjet.dart';
 import 'package:flutter/material.dart';
@@ -55,16 +53,12 @@ String projectName;
   @override
   Widget build(BuildContext context) {
     final focus = FocusScope.of(context);
-
     return Scaffold(
-        appBar: AppBar(title: Row(
-          children: [
+        appBar: AppBar(title:
             ContentApp(
               code: 'addTask',
-            ),
-            Text(" $projectName")
-      ],
-        )),
+            )
+        ),
    backgroundColor: hexToColor('#F3F6FC'),
      body: Padding(
      padding: const EdgeInsets.all(12.0),
@@ -80,9 +74,11 @@ String projectName;
              onEditingComplete: () => focus.nextFocus(),
              onChanged: (str) {
                setState(() {
+
                  _autoValidate=false;
                });
              },
+
              validator: (value) {
                if (value.isEmpty) {
                  return S.of(context).empty;
@@ -120,29 +116,7 @@ String projectName;
                    onTap: (){},
                    child:Icon(Icons.calendar_today))
            ),
-         /*  (Provider.of<UserModel>(context).user.isAdmin)?
-           TextFormFieldWidget(
-             textInputAction: TextInputAction.next,
-             onEditingComplete: () => focus.nextFocus(),
-             keyboardType: TextInputType.text,
-             onChanged: (str) {
-               setState(() {
-                 _autoValidate=false;
-               });             },
-             validator: (value) {
-               if (value.isEmpty) {
-                 return S.of(context).empty;
-               }
-             },
-             onSave: (String value) {
-               widget.isTask?_task.assignedTo=value:_meettingsModel.time = value;
-             },
-             hintText:widget.isTask?S.of(context).assignedTo:S.of(context).time,
-           ):
-           Container(
-             padding: EdgeInsets.symmetric(horizontal: 9, vertical: 18),
-             child:  Text('Assigned To\n ${(Provider.of<UserModel>(context).user.name)}', style: TextStyle(fontSize: 16,color: Colors.black),),
-           ),*/
+
            widget.isTask? Container():TextFormFieldWidget(
              textInputAction: TextInputAction.next,
              onEditingComplete: () => focus.nextFocus(),
@@ -233,17 +207,17 @@ String projectName;
        ),
      ),
    ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton:FloatingActionButton(
         backgroundColor:Color(0xffe9a14e),
         onPressed: () async {  if (_formKey.currentState.validate()) {
           _formKey.currentState.save();
           if(widget.isTask){
-            //_task.taskStage='New';
-           // print(_task.toString());
-              taskList.add(_task);
-              expandList.add(false);
-             await Provider.of<TaskModel>(context,listen: false).creatNewTask(_task.taskName,widget.projectid);//.userTasks.add(_task);
-              Navigator.of(context).pop();
+            await Provider.of<TaskModel>(context,listen: false).creatNewTask(_task.taskName, widget.projectid);
+             Provider.of<TaskModel>(context,listen: false).userTasks.add(_task);
+            //await Provider.of<TaskModel>(context,listen: false).getUserTasks(widget.projectid);
+
+            expandList.add(false);
+            Navigator.pop(context,true );
           }else{
             _meettingsModel.state='Schedule';
            // print(_meettingsModel.toString());
@@ -277,43 +251,4 @@ class _CreateTaskState extends State<CreateTask> {
 //    return FormWidget();
   }
 }
-/*
-
-class FormWidget extends StatelessWidget {
-  List minForm;
-  List taskForm;
-  final isTask;
-   FormWidget({Key key, this.isTask}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    taskForm=[S.of(context).projectTitle, S.of(context).projectTask,S.of(context).description, S.of(context).assignedTo];
-    minForm=isTask?taskForm:[S.of(context).title, S.of(context).location,S.of(context).date, S.of(context).time, S.of(context).duration, S.of(context).agenda, S.of(context).agreement, S.of(context).member];
-
-    return Scaffold(
-      appBar: AppBar(),
-      body: ListView(
-        color: hexToColor('#F3F6FC'),
-        height: MediaQuery.of(context).size.height,
-        child: ListView.builder(
-            itemCount: minForm.length,
-            itemBuilder: (context, index){
-          return TextFormFieldWidget(
-            validator: (String s){
-              return S.of(context).empty;
-            },
-            hintText:minForm[index],// 'Title',
-            onChanged: (String s){},
-            onSave: (String s){},
-            prefixIcon: Container(),
-            suffixIcon: InkWell(
-               //onTap: _toggle,
-               child:Icon(Icons.add)
-            ),
-          );
-
-    ));
-  }
-}
-*/
 

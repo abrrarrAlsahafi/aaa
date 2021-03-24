@@ -92,7 +92,8 @@ class EmomApi implements BaseServices {
             'Content-Type': 'application/json',
             'Accept': 'application/json'
           });
-      print('code logout response : ${response.statusCode}, $response');
+     // print('code logout response : ${response.statusCode}, $response');
+//Todo:cose Provider
     } catch (err) {
       print('$err');
       rethrow;
@@ -110,7 +111,7 @@ class EmomApi implements BaseServices {
   @override
   Future<dynamic> login({username, password}) async {
     connect();
-    print(_client);
+   // print(_client);
     try {
       var response = await http.post("${_client}web/session/authenticate",
           body: convert.jsonEncode({
@@ -122,12 +123,15 @@ class EmomApi implements BaseServices {
             'Accept': 'application/json'
           }); //_setHeaders());
       updateCookie(response);
+      //print(response.body);
+
       final body = convert.jsonDecode(response.body);
       if (!response.body.contains("error")) {
         SharedPreferences localStorage = await SharedPreferences.getInstance();
         localStorage.setString('session_id', headers);
         localStorage.setInt('uid', body['result']['uid']);
         localStorage?.setBool("isLoggedIn", true);
+        // print(response.body);
 
         return User.fromJson(body['result']);
       } else {
@@ -167,7 +171,7 @@ class EmomApi implements BaseServices {
         final iReg = RegExp(r'(\d+)');
         String s = iReg.allMatches(strNum).map((m) => m.group(0)).join(' ');
         var newid = int.parse(s.substring(4));
-        print(iReg.allMatches(strNum).map((m) => m.group(0)).join(' '));
+        //print(iReg.allMatches(strNum).map((m) => m.group(0)).join(' '));
         return newid;
       }
       // String strNum= "{\"code\": 200, \"message\": \"Channel Created\", \"channel_id\": 32}";
@@ -281,7 +285,7 @@ class EmomApi implements BaseServices {
 
   @override
   Future<List<Massege>> getMassegesContext(var masgId) async {
-    //print(masgId);
+    print(masgId);
     SharedPreferences localStorage = await SharedPreferences.getInstance();
     String id = localStorage.get('session_id');
     try {
@@ -296,6 +300,7 @@ class EmomApi implements BaseServices {
           list.add(Massege.fromJson(item));
         }
       }
+    //  print('response 1111 ${response.body}');
 
       return list;
     } catch (e) {
@@ -328,7 +333,8 @@ class EmomApi implements BaseServices {
     }
   }
 
-  Future<int> createTask({taskName}) async {
+  Future<void> createTask({taskName, projId}) async {
+    print('$projId');
     SharedPreferences localStorage = await SharedPreferences.getInstance();
     String id = localStorage.get('session_id');
     try {
@@ -337,7 +343,7 @@ class EmomApi implements BaseServices {
         headers: _setHeaders(id),
         body: convert.jsonEncode({
           "jsonrpc": "2.0",
-          "params": {"task_name": "$taskName"}
+          "params": {"task_name": "$taskName", "project_id":projId}
         }),
       );
       final body = json.decode(response.body);
@@ -345,9 +351,10 @@ class EmomApi implements BaseServices {
         String strNum = "${body['result'].toString()}";
         final iReg = RegExp(r'(\d+)');
         String s = iReg.allMatches(strNum).map((m) => m.group(0)).join(' ');
-        var newid = int.parse(s.substring(4));
-        print(iReg.allMatches(strNum).map((m) => m.group(0)).join(' '));
-        return newid;
+     //   var newid = int.parse(s.substring(4));
+       // print("body: $body");
+      //  print(iReg.allMatches(strNum).map((m) => m.group(0)).join(' '));
+       // return newid;
       }
     } catch (e) {
       rethrow;
@@ -377,7 +384,7 @@ class EmomApi implements BaseServices {
 
   @override
   Future<void> addMembers(channelId, memberId) async {
-    print("$channelId , $memberId ");
+  //  print("$channelId , $memberId ");
     SharedPreferences localStorage = await SharedPreferences.getInstance();
     String id = localStorage.get('session_id');
     var res = await http.post("${_client}chat/add_members",
@@ -390,11 +397,12 @@ class EmomApi implements BaseServices {
         'Accept': 'application/json',
         'Cookie': 'frontend_lang=en_US; session_id=$id'});
 
-    print("response add member ${res.body}");
+   // print("response add member ${res.body}");
   }
 
   @override
   Future<void> logNote(message, taskId) async {
+
     SharedPreferences localStorage = await SharedPreferences.getInstance();
     String id = localStorage.get('session_id');
     var res = await http.post("${_client}project/log_note",
@@ -409,17 +417,12 @@ class EmomApi implements BaseServices {
         }
         //{'Cookie': 'frontend_lang=en_US; session_id=$id'}
         );
-    print(res.body);
-  }
-
-  @override
-  Future sginOut({username, password}) {
-    // TODO: implement sginOut
-   // throw UnimplementedError();
+   // print(res.body);
   }
 
   @override
   Future<void> assignTask({uid, tid}) async {
+  //  print("$uid  task  $tid");
     // TODO: implement assignTask
     SharedPreferences localStorage = await SharedPreferences.getInstance();
     String id = localStorage.get('session_id');
@@ -434,13 +437,14 @@ class EmomApi implements BaseServices {
         body: convert.jsonEncode(
           {
             "jsonrpc": "2.0",
-            "params": {"user_id": "$uid", "task_id": "$tid"}
+            "params": {"user_id": uid, "task_id": tid}
           },
         ),
       );
-      print("Assigned task ${response.body}");
-      if (response.statusCode == 200)
-           print("Assigned task ${response.body}");
+    //  print("Assigned task ${response.body}");
+    //  if (response.statusCode == 200)
+          // print("Assigned task ${response.body}"
+      //  );
 
     } catch (e) {
       rethrow;

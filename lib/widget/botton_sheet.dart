@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:management_app/Screen/chat/chat_list.dart';
-import 'package:management_app/Screen/member_list.dart';
 import 'package:management_app/app_theme.dart';
-import 'package:management_app/common/constant.dart';
-import 'package:management_app/model/channal.dart';
 import 'package:management_app/model/folowing.dart';
 import 'package:management_app/widget/content_translate.dart';
 import 'package:provider/provider.dart';

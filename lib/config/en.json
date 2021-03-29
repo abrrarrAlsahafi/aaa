@@ -10,7 +10,7 @@
   "passvalidation":"Password is empty",
   "emailvalidation": "User Name is empty",
   "home": "Home",
-  "meetings": "Meetings",
+  "meetings": "Session",
   "chat": "Chat",
   "tasks": "Tasks",
   "more": "More",
@@ -70,7 +70,7 @@
   "progectManeger": "Dirctor",
 "noTask": "There is no Task you can Add one",
   "editor": "Editor",
-  "approval": "Approval"
-
+  "approval": "Approval",
+"reply":"Reply"
 }
 

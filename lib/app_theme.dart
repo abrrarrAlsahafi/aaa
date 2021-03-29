@@ -14,9 +14,9 @@ class MyTheme {
   static Color kUnreadChatBG = Color(0xffe9a14e);
 
   static final TextStyle kAppTitle = GoogleFonts.tajawal(
-      fontSize: ScreenUtil().setSp(24, allowFontScalingSelf: true),
+      fontSize: ScreenUtil().setSp(20, allowFontScalingSelf: true),
       fontWeight: FontWeight.bold,
-      color: Colors.white);
+      color:Color(0xff336699) );
   static final TextStyle heading2 = TextStyle(
     color: Colors.black,
     fontSize: ScreenUtil().setSp(16, allowFontScalingSelf: true),

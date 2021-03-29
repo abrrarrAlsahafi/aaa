@@ -4,6 +4,7 @@ import 'package:management_app/services/emom_api.dart';
 class Task {
   int taskId;
   String taskName;
+  String desc;
   String assignedTo;
   bool taskStage;
   String project;

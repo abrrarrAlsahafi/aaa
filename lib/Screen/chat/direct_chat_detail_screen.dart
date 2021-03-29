@@ -1,11 +1,8 @@
 import 'dart:async';
 
 import 'package:management_app/Screen/chat/chat_info.dart';
-import 'package:management_app/app_theme.dart';
-import 'package:management_app/bottom_bar.dart';
 import 'package:management_app/generated/I10n.dart';
 import 'package:management_app/model/channal.dart';
-import 'package:management_app/model/folowing.dart';
 import 'package:management_app/model/massege.dart';
 import 'package:management_app/model/user.dart';
 import 'package:management_app/services/emom_api.dart';
@@ -49,7 +46,7 @@ class _MyDirectChatDetailPageState extends State<MyDirectChatDetailPage> {
   final double minValue = 8.0;
   final double iconSize = 28.0;
   bool _disposed = false;
-  List<Massege> myMessages = List();
+  List<Massege> myMessages = [];
   FocusNode _focusNode;
   TextEditingController _txtController = TextEditingController();
   bool isCurrentUserTyping = false;
@@ -58,7 +55,7 @@ class _MyDirectChatDetailPageState extends State<MyDirectChatDetailPage> {
   Timer timer;
   Chat newChatRom;
   String message = '';
-  List m = List();
+  List m =[];
   int uid;
 
   checkMember() {
@@ -87,12 +84,16 @@ class _MyDirectChatDetailPageState extends State<MyDirectChatDetailPage> {
     } else {
       //myMessages = Provider.of<ChatModel>(context, listen: false).chatMasseges( widget.mid);
       getMasseges();
-      timer = Timer.periodic(Duration(seconds: 5), (Timer t) {
+      timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
+        print('${Provider.of<NewMessagesModel>(context, listen: false)
+            .newMessages
+            .totalNewMessages}');
         //  if (Provider.of<NewMessagesModel>(context, listen: false).totalm > 0){
         if (Provider.of<NewMessagesModel>(context, listen: false)
                 .newMessages
                 .totalNewMessages >
             0) {
+
           this.newDirctMassege();
           // setState(() {});
         }
@@ -107,10 +108,9 @@ class _MyDirectChatDetailPageState extends State<MyDirectChatDetailPage> {
 */
   @override
   void dispose() {
-    timer?.cancel();
-
-    _disposed = true;
     super.dispose();
+    timer?.cancel();
+    _disposed = true;
   }
 
   getMasseges() {
@@ -353,10 +353,7 @@ class _MyDirectChatDetailPageState extends State<MyDirectChatDetailPage> {
         ],
       ),
       leading: GestureDetector(
-        onTap: () {
-          print('back ...');
-          Navigator.pushReplacementNamed(context, "/a");
-        },
+        onTap: () =>Navigator.pushReplacementNamed(context, "/a"),
         child: Container(
           //  color: Colors.black,
           height: 55,

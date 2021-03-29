@@ -1,27 +1,36 @@
 
+import 'package:management_app/model/topic.dart';
+
 class Meetings {
   int taskId;
   String taskName;
   String assignedTo;
-  bool taskStage;
+  String taskStage;
   String project;
   String createDate;
   String createBy;
+  List<Topic> tobics;
+  int namber;
+  String source;
 
   Meetings(
-        {this.taskId,
+        {this.source,this.taskId,
         this.taskName,
         this.assignedTo,
         this.taskStage,
         this.project,
         this.createDate,
-        this.createBy});
+        this.createBy,
+        this.tobics,
+        this.namber
+
+        });
 
   Meetings.fromJson(Map<String, dynamic> json) {
     taskId = json['task_id'];
     taskName = json['task_name'];
     assignedTo = json['assigned_to'];
-    taskStage = json['task_stage']=="true"?true:false;
+    taskStage = json['task_stage'];
     project = json['project'];
     createDate = json['create_date'];
     createBy = json['create_by'];

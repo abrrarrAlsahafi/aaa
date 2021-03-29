@@ -333,8 +333,8 @@ class EmomApi implements BaseServices {
     }
   }
 
-  Future<void> createTask({taskName, projId}) async {
-    print('$projId');
+  Future<void> createTask({Task taskName, int projId}) async {
+    //print('$projId');
     SharedPreferences localStorage = await SharedPreferences.getInstance();
     String id = localStorage.get('session_id');
     try {
@@ -343,7 +343,7 @@ class EmomApi implements BaseServices {
         headers: _setHeaders(id),
         body: convert.jsonEncode({
           "jsonrpc": "2.0",
-          "params": {"task_name": "$taskName", "project_id":projId}
+          "params": {"task_name": "${taskName.taskName}", "project_id":projId, "description":"${taskName.desc}"}
         }),
       );
       final body = json.decode(response.body);
@@ -352,7 +352,7 @@ class EmomApi implements BaseServices {
         final iReg = RegExp(r'(\d+)');
         String s = iReg.allMatches(strNum).map((m) => m.group(0)).join(' ');
      //   var newid = int.parse(s.substring(4));
-       // print("body: $body");
+        print("body: ${s.substring(5)}");
       //  print(iReg.allMatches(strNum).map((m) => m.group(0)).join(' '));
        // return newid;
       }

@@ -15,6 +15,8 @@ import 'package:management_app/widget/expanded_selection.dart';
 import 'package:management_app/widget/flat_action_botton_wedget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:management_app/widget/slide_left.dart';
+import 'package:management_app/widget/slide_right.dart';
 import 'package:provider/provider.dart';
 
 import 'chat/chat_list.dart';
@@ -79,67 +81,8 @@ class _TaskScreenState extends State<TaskScreen> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  Widget slideRightBackground() {
-    return Container(
-      padding: EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8.0),
-        color: MyTheme.kPrimaryColorVariant,
-      ),
-      child: Align(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              SizedBox(width: 10),
-              Icon(Icons.reply, color: Colors.white),
-              SizedBox(width: 10),
-              Text("Reply",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                  ),
-                  textAlign: TextAlign.left),
-            ],
-          ),
-          alignment: Alignment.centerLeft),
-    );
-  }
 
-  Widget slideLeftBackground() {
-    return Container(
-      padding: EdgeInsets.all(12),
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8.0), color: Color(0xffe9a14e)),
-      child: Align(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Icon(
-              (Provider.of<UserModel>(context).user.isAdmin)
-                  ? Icons.person_add_outlined
-                  : Icons.redo,
-              color: Colors.white,
-            ),
-            Text(
-              (Provider.of<UserModel>(context).user.isAdmin)
-                  ? " Assign to"
-                  : "Next State",
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
-              ),
-              textAlign: TextAlign.right,
-            ),
-            SizedBox(width: 12),
-            SizedBox(
-              width: 20,
-            ),
-          ],
-        ),
-        alignment: Alignment.centerRight,
-      ),
-    );
-  }
+
 
   bool addTask = false;
 
@@ -166,8 +109,9 @@ class _TaskScreenState extends State<TaskScreen> with TickerProviderStateMixin {
             var result = await Navigator.push(
                 context,
                 new MaterialPageRoute(
-                  builder: (BuildContext context) => new CreateMeetings(
-                    isTask: true,
+                  builder: (BuildContext context) => new CreateScreen(
+                    //isTask: true,
+                    item: Task(),
                     projectid: widget.projectid.id,
                   ),
                   fullscreenDialog: true,
@@ -221,15 +165,18 @@ class _TaskScreenState extends State<TaskScreen> with TickerProviderStateMixin {
                   child: Dismissible(
                       key: Key('${taskList[index].taskName}'),
                       child: CartTask(
-                        child: TaskNote(note: [
-                          Note(
-                              name: 'Shaya',
-                              messege: 'Assigned to:System Muhammad Faizal NS'),
-                          Note(
-                              name: 'Shaya',
-                              messege:
-                              'Dear customer,\nThank you for your enquiry.\nIf you have any questions,\nplease let us know.Thank you,\nread more')
-                        ] //,Note(messege: 'assiiiii'),Note(id: 0,sender:,messege: 'aaaaaa' )],
+                        child: Container(
+                          height: 200,
+                          child: TaskNote(note: [
+                            Note(
+                                name: 'Shaya',
+                                messege: 'Assigned to:System Muhammad Faizal NS'),
+                            Note(
+                                name: 'Shaya',
+                                messege:
+                                'Dear customer,\nThank you for your enquiry.\nIf you have any questions,\nplease let us know.Thank you,\nread more')
+                          ] //,Note(messege: 'assiiiii'),Note(id: 0,sender:,messege: 'aaaaaa' )],
+                          ),
                         ),
                           click: expandList[index],
                           onTap: () {
@@ -238,20 +185,37 @@ class _TaskScreenState extends State<TaskScreen> with TickerProviderStateMixin {
                                   expandList[index] ? false : true;
                             });
                           },
-                          //proi: proi,
+                        //  proirty:
+                          listTile:ListTile(
+                              leading: IconButton(
+                                  icon: Icon(proi ? Icons.star : Icons.star_border),
+                                  color: Color(0xffe9a14e),
+                                  onPressed: () {
+                                    setState(() {
+                                      proi = proi ? proi : false;
+                                    });
+                                  }),
+                              dense: true,
+                              title: Text( taskList[ index].taskName,
+                                  style:
+                                  TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                              subtitle: Text(
+                                  "by ${ taskList[ index].createBy}  on  ${DateFormat.yMMMd().format(taskList[index].createDate == null ? DateTime.now() : DateTime.parse(taskList[index].createDate))} \nTo ${taskList[index].assignedTo}",
+                                  style: TextStyle(fontSize: 10))),
 
-                          proirty: IconButton(
-                              icon: Icon(proi ? Icons.star : Icons.star_border),
-                              color: Color(0xffe9a14e),
-                              onPressed: () {
-                                setState(() {
-                                  proi = proi ? proi : false;
-                                });
-                              }),
-                          item: taskList[ index]
+
+
                           ),
-                      background: slideRightBackground(),
-                      secondaryBackground: slideLeftBackground(),
+                      background: SlideRightBackgroundWidget(),
+                      secondaryBackground: SlideLeftWidget(
+                        icon: (Provider.of<UserModel>(context).user.isAdmin)
+                            ? Icons.person_add_outlined
+                            : Icons.redo,
+                        title: (Provider.of<UserModel>(context).user.isAdmin)
+                            ? " Assign to"
+                            : "Next State",
+                      ),
+
                       confirmDismiss: (direction) async {
                         if (direction == DismissDirection.endToStart) {
                           final bool res = await showDialog(
@@ -299,7 +263,8 @@ class _TaskScreenState extends State<TaskScreen> with TickerProviderStateMixin {
                                     ));
                               });
                         }
-                      }));
+                      })
+              );
             }));
   }
 }
@@ -473,7 +438,7 @@ _generateBorderRadius(index, _selectedTab) {
 }
 
 class CartTask extends StatelessWidget {
-  final item;
+  final listTile;
   final onTap;
   final click;
   final proirty;
@@ -482,7 +447,7 @@ class CartTask extends StatelessWidget {
   // final isProject;
   CartTask(
       {Key key,
-      this.item,
+      this.listTile,
       this.onTap,
       this.click,
       this.onTapstar,
@@ -492,6 +457,7 @@ class CartTask extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -509,19 +475,11 @@ class CartTask extends StatelessWidget {
           children: [
             //  SizedBox(height: 22),
             //  ListTile(leading :Text('Project name: ', ), title: Text(task.project.toUpperCase(),style: TextStyle(fontWeight: FontWeight.w300, fontSize: 16)),dense: true  ),
-            ListTile(
-                leading: proirty,
-                dense: true,
-                title: Text(item.taskName,
-                    style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                subtitle: Text(
-                    "by ${item.createBy}  on  ${DateFormat.yMMMd().format(item.createDate == null ? DateTime.now() : DateTime.parse(item.createDate))} \nTo ${item.assignedTo}",
-                    style: TextStyle(fontSize: 10))),
+            listTile,
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 12),
-              child: Divider(
-                color: Colors.black12,
+              child: Center(
+                child: click?Icon(Icons.keyboard_arrow_up,size: 12, color:Colors.black26): Icon(Icons.keyboard_arrow_down,size: 12, color:Colors.black26),
               ),
             ),
 
@@ -536,7 +494,7 @@ class CartTask extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    height: 200,
+                  //  height: ,
                     // decoration: Bo,
                     //   color: Colors.grey[100],
                     child: child

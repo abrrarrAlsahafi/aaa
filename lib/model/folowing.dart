@@ -33,6 +33,9 @@ class FollowingModel extends ChangeNotifier {
   FollowingModel(this.followList);
   getfollowingList() async {
     followList = await EmomApi().getfollowingList();
+ followList.forEach((element) {
+   //followList.
+ });
   }
 
   List<Folowing> channalMember;

@@ -65,14 +65,15 @@ class _BottomBarState extends State<BottomBar> with TickerProviderStateMixin {
     });
   }
 
-/*
+/**/
   @override
   void setState(fn) {
     if (mounted) {
+
       super.setState(fn);
     }
   }
-*/
+
 
   checkForNewSharedLists() async {
     // WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -126,6 +127,7 @@ class _BottomBarState extends State<BottomBar> with TickerProviderStateMixin {
       onTabChange();
     });
     tabController.dispose();
+
     super.dispose();
   }
 

@@ -6,6 +6,7 @@ import 'package:management_app/model/app_model.dart';
 import 'package:management_app/model/project.dart';
 import 'package:management_app/widget/card_list.dart';
 import 'package:management_app/widget/content_translate.dart';
+import 'package:management_app/widget/search.dart';
 import 'package:management_app/widget/subtitel_wedget.dart';
 import 'package:provider/provider.dart';
 
@@ -74,9 +75,7 @@ class _ProjectsState extends State<Projects> {
       //new SecondScreen(context),
       fullscreenDialog: true,)
     );
-   // setState(() {
-      //project.noOfTask=result;
-    //});
+
     AppModel().config(context);
 
       if(result) {
@@ -93,25 +92,17 @@ class _ProjectsState extends State<Projects> {
         },//locator<ProjectModel>(),
         child: Column(children: [
           search
-              ? ListTile(
-                  leading: new Icon(Icons.search),
-                  title: new TextField(
-                    controller: controller,
-                    decoration: new InputDecoration(
-                        hintText: 'Search', border: InputBorder.none),
-                    onChanged: onSearchTextChanged,
-                  ),
-                  trailing: new IconButton(
-                    icon: new Icon(Icons.close),
-                    onPressed: () {
-                      setState(() {
-                        search=false;
-                      });
-                      controller.clear();
-                      onSearchTextChanged('');
-                    },
-                  ),
-                )
+              ?  SearchWidget(
+            controller: controller,
+            onSearchTextChanged: onSearchTextChanged,
+            onPressed: () {
+              setState(() {
+                search=false;
+              });
+              controller.clear();
+              onSearchTextChanged('');
+            },
+          )
               : Container(),
           Expanded(
               child: Container(
@@ -124,7 +115,6 @@ class _ProjectsState extends State<Projects> {
                       itemBuilder: (context, index) {
                         return GestureDetector(
                             onTap:() =>goToSecondScreen(project: _userDetails[index]),
-
                             child: CardListWidget(
                               countName: 'tasks',
                               countNumber: Text(
@@ -152,9 +142,13 @@ class _ProjectsState extends State<Projects> {
                                     // dense: true,
                                     SizedBox(height: 6),
                                     Container(
-                                        child: SubTitelWidjet(
-                                            code: 'progectManeger',
-                                            titl:":  ${_searchResult.length != 0 || controller.text.isNotEmpty ? _searchResult[index].managerName : _userDetails[index].managerName == null ? '' : _userDetails[index].managerName}")),
+                                        child: SubTitelWidget(
+                                            child: ContentApp(
+                                              style: MyTheme.bodyText2,
+                                              code: 'progectManeger',
+                                            ),
+                                            title:":  ${_searchResult.length != 0 || controller.text.isNotEmpty ? _searchResult[index].managerName : _userDetails[index].managerName == null ? '' : _userDetails[index].managerName}")
+                                    ),
                                   ],
                                 ),
                               ),
@@ -164,6 +158,4 @@ class _ProjectsState extends State<Projects> {
                       })))
         ]));
   }
-
-
 }

@@ -11,7 +11,7 @@
   "emailvalidation": "يجب ادخال اسم المستخدم",
 
   "home": "الرئيسية",
-  "meetings": "الاجتماعات",
+  "meetings": "جلسة",
   "chat": "المحادثة",
   "tasks": "المهام",
   "more": "المزيد",
@@ -69,7 +69,7 @@
 "addMember":"اضافة الاعضاء",
 "progectManeger": "المدير",
   "noTask": "لايوجد مهام يمكنك اضافة مهمة",
-
+"reply":"رد",
   "editor": "محرر",
   "approval": "Approval"
 

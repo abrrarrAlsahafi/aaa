@@ -9,8 +9,9 @@ class Board {
   int managerId;
   String managerName;
   int noOfTask;
-
-  Board({this.id, this.name, this.managerId, this.managerName, this.noOfTask});
+  DateTime create;
+  int boardNumber;
+  Board({this.boardNumber,this.create,this.id, this.name, this.managerId, this.managerName, this.noOfTask});
 
   Board.fromJson(Map<String, dynamic> json) {
     id = json['id'];

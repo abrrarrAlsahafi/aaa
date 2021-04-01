@@ -71,6 +71,7 @@
 "noTask": "There is no Task you can Add one",
   "editor": "Editor",
   "approval": "Approval",
-"reply":"Reply"
+"reply":"Reply",
+  "logNote": "Notes"
 }
 

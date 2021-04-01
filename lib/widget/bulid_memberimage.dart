@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:management_app/model/channal.dart';
 import 'package:management_app/model/folowing.dart';
+import 'package:management_app/model/note.dart';
 
 class MembertImage extends StatelessWidget {
   final item;
@@ -10,7 +11,8 @@ class MembertImage extends StatelessWidget {
   const MembertImage({Key key, this.item}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return buildImage(item);
+    return item.runtimeType==Note?buildUserImage(item)
+    :buildImage(item);
   }
 
 
@@ -47,7 +49,6 @@ class MembertImage extends StatelessWidget {
 
     if(item.runtimeType==Chat){
       print('item run type ${item.isChat}');
-
       return Container(
         width: 55,
         height: 55,
@@ -63,6 +64,7 @@ class MembertImage extends StatelessWidget {
         ),
       );
     }
+   // if(item)
     }
   }
 
@@ -76,5 +78,34 @@ class MembertImage extends StatelessWidget {
         shape: BoxShape.circle,
         border: Border.all(color: Colors.grey[200]))
     );
+  }
+
+  buildUserImage(item) {
+    /*
+    *  var str = item.image.toString().substring(2,item.image.toString().length - 1);
+          str = base64.normalize(str);
+          return Container(
+            width:40,
+            height:40,
+            decoration: BoxDecoration(
+              image:DecorationImage(
+                image:Image(
+                  gaplessPlayback: true,
+                  image:Image.memory(
+                  base64.decode(str),
+                  fit: BoxFit.cover,
+                  height: 40,
+                  width: 40
+                ).image,
+                fit: BoxFit.cover,
+              ).image  ,
+              ),
+              borderRadius:BorderRadius.circular(33),
+                border: Border.all(color: Colors.grey[200])
+            ),
+          );*/
+ //   Provider.of<>(context)
+   // item.user
+
   }
 }

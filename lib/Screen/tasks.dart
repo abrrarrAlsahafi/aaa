@@ -2,14 +2,11 @@ import 'dart:async';
 import 'package:intl/intl.dart';
 import 'package:management_app/Screen/create_meeting.dart';
 import 'package:management_app/app_theme.dart';
-import 'package:management_app/common/constant.dart';
-import 'package:management_app/generated/I10n.dart';
-import 'package:management_app/model/folowing.dart';
 import 'package:management_app/model/note.dart';
+import 'package:management_app/model/project.dart';
 import 'package:management_app/model/task.dart';
 import 'package:management_app/model/user.dart';
-import 'package:management_app/services/emom_api.dart';
-import 'package:management_app/widget/buttom_widget.dart';
+import 'package:management_app/widget/alert_dialog_widget.dart';
 import 'package:management_app/widget/content_translate.dart';
 import 'package:management_app/widget/expanded_selection.dart';
 import 'package:management_app/widget/flat_action_botton_wedget.dart';
@@ -44,7 +41,9 @@ class _TaskScreenState extends State<TaskScreen> with TickerProviderStateMixin {
   List<Task> taskList;
   int _selectedTab = 0;
   Future<TaskModel> _calculation;
+  bool isManeger= false;
 
+  //List<Note> note;
   @override
   void initState() {
     super.initState();
@@ -64,11 +63,11 @@ class _TaskScreenState extends State<TaskScreen> with TickerProviderStateMixin {
     // print("frist $taskList");
     taskList = await Provider.of<TaskModel>(context, listen: false)
         .getUserTasks(widget.projectid.id);
+  //  await Provider.of<TaskModel>(context, listen: false).viewLogNote();
 
     expandList = List.generate(taskList.length, (index) => false);
     setState(() {});
-    // });
-    //  return taskList;
+
   }
 
   bool click = false;
@@ -79,6 +78,7 @@ class _TaskScreenState extends State<TaskScreen> with TickerProviderStateMixin {
     _disposed = true;
     taskList.clear();
     super.dispose();
+    isManeger=false;
   }
 
 
@@ -88,96 +88,103 @@ class _TaskScreenState extends State<TaskScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          leading: Container(
-              child: IconButton(
-                  icon: Icon(
-                    Icons.arrow_back_ios,
-                  ),
-                  color: MyTheme.kPrimaryColorVariant,
-                  onPressed: () {
-                    Navigator.pop(context, addTask);
-                  })),
-          title: Text(widget.projectid.name, style: MyTheme.kAppTitle),
-        ),
-        backgroundColor: MyTheme.kAccentColor,
-        floatingActionButton: FlatActionButtonWidget(
-          icon: Icons.playlist_add,
-          onPressed: () async {
-            var result = await Navigator.push(
-                context,
-                new MaterialPageRoute(
-                  builder: (BuildContext context) => new CreateScreen(
-                    //isTask: true,
-                    item: Task(),
-                    projectid: widget.projectid.id,
-                  ),
-                  fullscreenDialog: true,
-                ));
-            setState(() {
-              addTask = result;
-            });
-          },
-          tooltip: 'task',
-        ), //:Container(),
-        body: FutureBuilder<void>(builder: (BuildContext context, snapshot) {
-          if (snapshot.hasData || taskList == null) {
-            return Center(
-              child: CircularProgressIndicator(
-                backgroundColor: Color(0xff336699),
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-              ),
-            );
-          } else if (taskList.isEmpty) {
-            return Center(
-                child: Column(
-              children: [
-                SizedBox(height: 50),
-                Icon(Icons.playlist_add,
-                    size: MediaQuery.of(context).size.width / 2,
-                    color: Colors.grey[300]),
-                SizedBox(height: 50),
-                ContentApp(
-                  code: 'noTask',
-                  style: MyTheme.bodyTextTask,
+
+    return  WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            leading: Container(
+                child: IconButton(
+                    icon: Icon(
+                      Icons.arrow_back_ios,
+                    ),
+                    color: MyTheme.kPrimaryColorVariant,
+                    onPressed: () {
+                      Navigator.pop(context, addTask);
+                    })),
+            title: Text(widget.projectid.name, style: MyTheme.kAppTitle),
+          ),
+          backgroundColor: MyTheme.kAccentColor,
+          floatingActionButton: FlatActionButtonWidget(
+            icon: Icons.playlist_add,
+            onPressed: () async {
+              var result = await Navigator.push(
+                  context,
+                  new MaterialPageRoute(
+                    builder: (BuildContext context) => new CreateScreen(
+                      //isTask: true,
+                      item: Task(),
+                      projectid: widget.projectid.id,
+                    ),
+                    fullscreenDialog: true,
+                  ));
+              setState(() {
+                addTask = result;
+              });
+            },
+            tooltip: 'task',
+          ), //:Container(),
+          body: FutureBuilder<void>(builder: (BuildContext context, snapshot) {
+            if (snapshot.hasData || taskList == null) {
+             // print('taskList  ${taskList}');
+              return Center(
+                child: CircularProgressIndicator(
+                  backgroundColor: Color(0xff336699),
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                 ),
-              ],
-            ));
-          } else {
-            return bodyTask();
-          }
-        }));
+              );
+            } else if (taskList.isEmpty) {
+              return Center(
+                  child: Column(
+                children: [
+                  SizedBox(height: 50),
+                  Icon(Icons.playlist_add,
+                      size: MediaQuery.of(context).size.width / 2,
+                      color: Colors.grey[300]),
+                  SizedBox(height: 50),
+                  ContentApp(
+                    code: 'noTask',
+                    style: MyTheme.bodyTextTask,
+                  ),
+                ],
+              ));
+            } else {
+              print("widget.projectid ${widget.projectid}");
+              String userName=Provider.of<UserModel>(context, listen: false).user.name;
+              Provider.of<ProjectModel>(context, listen: false).userProject.forEach((element) {
+                print(element.id==widget.projectid);
+               // if( element.id ==widget.projectid){
+                  if(element.managerName==userName){
+                 //   setState(() {
+                      isManeger=true;
+                  //  });
+                //  }
+                }
+              });
+              return bodyTask();
+            }
+          })),
+    );
     //));
   }
 
   bool proi = false;
-
   bodyTask() {
+
+    print(" bodyTa  $isManeger");
     return Padding(
         padding: const EdgeInsets.all(12.0),
         child: ListView.builder(
             itemCount: taskList.length,
-            itemBuilder: (context, index) {
+            itemBuilder: (context, index)  {
               return Container(
-                  padding: EdgeInsets.symmetric(vertical: 6, horizontal: 1),
+                  padding: EdgeInsets.symmetric(vertical: 6, horizontal: 6),
                   child: Dismissible(
                       key: Key('${taskList[index].taskName}'),
                       child: CartTask(
-                        child: Container(
-                          height: 200,
-                          child: TaskNote(note: [
-                            Note(
-                                name: 'Shaya',
-                                messege: 'Assigned to:System Muhammad Faizal NS'),
-                            Note(
-                                name: 'Shaya',
-                                messege:
-                                'Dear customer,\nThank you for your enquiry.\nIf you have any questions,\nplease let us know.Thank you,\nread more')
-                          ] //,Note(messege: 'assiiiii'),Note(id: 0,sender:,messege: 'aaaaaa' )],
-                          ),
-                        ),
+                        des:taskList[index],
+                        child:TaskNote(note:taskList[index].notes),
                           click: expandList[index],
                           onTap: () {
                             setState(() {
@@ -187,35 +194,30 @@ class _TaskScreenState extends State<TaskScreen> with TickerProviderStateMixin {
                           },
                         //  proirty:
                           listTile:ListTile(
-                              leading: IconButton(
+                             /* leading: IconButton(
                                   icon: Icon(proi ? Icons.star : Icons.star_border),
                                   color: Color(0xffe9a14e),
                                   onPressed: () {
                                     setState(() {
                                       proi = proi ? proi : false;
                                     });
-                                  }),
-                              dense: true,
+                                  }),*/
+                             // dense: true,
                               title: Text( taskList[ index].taskName,
                                   style:
                                   TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                               subtitle: Text(
-                                  "by ${ taskList[ index].createBy}  on  ${DateFormat.yMMMd().format(taskList[index].createDate == null ? DateTime.now() : DateTime.parse(taskList[index].createDate))} \nTo ${taskList[index].assignedTo}",
-                                  style: TextStyle(fontSize: 10))),
-
-
-
-                          ),
+                                  "by ${ taskList[ index].createBy}  on  ${DateFormat.yMMMd().format(taskList[index].createDate == null ? DateTime.now() : DateTime.parse(taskList[index].createDate))} To ${taskList[index].assignedTo}",
+                                  style: TextStyle(fontSize: 11)))),
                       background: SlideRightBackgroundWidget(),
-                      secondaryBackground: SlideLeftWidget(
-                        icon: (Provider.of<UserModel>(context).user.isAdmin)
+                      secondaryBackground:isManeger? SlideLeftWidget(
+                        icon:isManeger// (Provider.of<UserModel>(context).user.isAdmin)
                             ? Icons.person_add_outlined
                             : Icons.redo,
-                        title: (Provider.of<UserModel>(context).user.isAdmin)
-                            ? " Assign to"
-                            : "Next State",
-                      ),
-
+                        title:// isManeger//(Provider.of<UserModel>(context).user.isAdmin)
+                             " Assign to"
+                           // : "Next State",
+                      ):Container(),
                       confirmDismiss: (direction) async {
                         if (direction == DismissDirection.endToStart) {
                           final bool res = await showDialog(
@@ -226,10 +228,8 @@ class _TaskScreenState extends State<TaskScreen> with TickerProviderStateMixin {
                                     index: taskList[index],
                                     dearection: true,
                                     title: Text(
-                                      (Provider.of<UserModel>(context,
-                                                  listen: false)
-                                              .user
-                                              .isAdmin)
+                                      isManeger
+                                    //  (Provider.of<UserModel>(context,   listen: false) .user .isAdmin)
                                           ? "You want to assgin ${taskList[index].taskName} task to?"
                                           : "Log note",
                                       style: TextStyle(
@@ -250,11 +250,8 @@ class _TaskScreenState extends State<TaskScreen> with TickerProviderStateMixin {
                                 return AlertDialogPM(
                                     index: taskList[index],
                                     dearection: false,
-                                    title: Text(
-                                      (Provider.of<UserModel>(context,
-                                                  listen: false)
-                                              .user
-                                              .isAdmin)
+                                    title: Text(isManeger
+                                  //   (isManeger|| Provider.of<UserModel>(context,  listen: false) .user .isAdmin)
                                           ? "Log note"
                                           : "Replay",
                                       style: TextStyle(
@@ -269,155 +266,13 @@ class _TaskScreenState extends State<TaskScreen> with TickerProviderStateMixin {
   }
 }
 
-class AlertDialogPM extends StatefulWidget {
-  final index;
-  final title;
-  final content;
-  final dearection;
-
-  AlertDialogPM(
-      {Key key, this.title, this.content, this.dearection, this.index})
-      : super(key: key);
-
-  @override
-  _AlertDialogPMState createState() => _AlertDialogPMState();
-}
-
-class _AlertDialogPMState extends State<AlertDialogPM> {
-  final _formKey = GlobalKey<FormState>();
-
-  bool _autoValidate = false;
-  bool massgeReseve = false;
-  String lognot;
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-        title: widget.title,
-        content: widget.dearection
-            ? Provider.of<UserModel>(context, listen: false).user.isAdmin
-                ? Container(
-                    width: MediaQuery.of(context).size.width /
-                        5, //double.minPositive,
-                    height: MediaQuery.of(context).size.height / 3,
-                    child: massgeReseve
-                        ? Icon(Icons.check_circle_rounded,
-                            size: 66, color: Color(0xffe9a14e))
-                        : ListView.separated(
-                            separatorBuilder: (context, index) => Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 12),
-                              child: Divider(
-                                color: Colors.black12,
-                              ),
-                            ),
-                            shrinkWrap: true,
-                            itemCount: Provider.of<FollowingModel>(context,
-                                    listen: false)
-                                .followList
-                                .length,
-                            itemBuilder: (BuildContext context, int index) {
-                              return ListTile(
-                                title: Text(Provider.of<FollowingModel>(context,
-                                        listen: false)
-                                    .followList[index]
-                                    .name),
-                                onTap: () {
-                                  setState(() {
-                                    massgeReseve = true;
-                                    Provider.of<TaskModel>(context,
-                                                listen: false)
-                                            .uidAssigind =
-                                        Provider.of<FollowingModel>(context,
-                                                listen: false)
-                                            .followList[index]
-                                            .id;
-                                  });
-                                  Navigator.of(context).pop();
-                                },
-                              );
-                            },
-                          ),
-                  )
-                : alertDialogAddnote()
-            : alertDialogAddnote());
-  }
-
-  alertDialogAddnote() {
-    return Container(
-      width: MediaQuery.of(context).size.width / 2, //double.minPositive,
-      height: MediaQuery.of(context).size.height / 3,
-      child: massgeReseve
-          ? Icon(Icons.check_circle_rounded, size: 66, color: Color(0xffe9a14e))
-          : Column(
-              children: [
-                Expanded(
-                  child: Container(
-                      child: Form(
-                    key: _formKey,
-                    //autovalidate: _autoValidate,
-                    child: TextFormField(
-                      validator: (value) {
-                        if (value.isEmpty) {
-                          return S.of(context).empty;
-                        } else
-                          return null;
-                      },
-                      onSaved: (String value) {
-                        lognot = value;
-                      },
-                      decoration: new InputDecoration(
-                        border: InputBorder.none,
-                        filled: false,
-                        contentPadding: new EdgeInsets.only(
-                            left: 10.0, top: 10.0, bottom: 10.0, right: 10.0),
-                        hintText: 'add review',
-                        hintStyle: new TextStyle(
-                          color: Colors.grey.shade500,
-                          fontSize: 12.0,
-                          //fontFamily: 'helvetica_neue_light',
-                        ),
-                      ),
-                    ),
-                  )),
-                  // flex: 2,
-                ),
-
-                // dialog bottom
-                ButtonWidget(
-                  // padding: new EdgeInsets.all(16.0),
-                  onPressed: () async {
-                    if (_formKey.currentState.validate()) {
-                      _formKey.currentState.save();
-                      await Provider.of<TaskModel>(context, listen: false)
-                          .logNot(lognot, widget.index.taskId //index.id
-                              );
-                      setState(() {
-                        massgeReseve = true;
-                      });
-                      Navigator.pop(context);
-                    }
-                  },
-                  child: Text(
-                    'Add',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18.0,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ],
-            ),
-    );
-  }
-}
 
 getTab(index, child, _selectedTab) {
   return Tab(
       child: SizedBox.expand(
           child: Container(
-    child: Center(
-      child: Text(
+           child: Center(
+             child: Text(
         child,
         style: TextStyle(fontSize: 11),
       ),
@@ -443,6 +298,7 @@ class CartTask extends StatelessWidget {
   final click;
   final proirty;
   final child;
+  final Task des;
 
   // final isProject;
   CartTask(
@@ -451,7 +307,7 @@ class CartTask extends StatelessWidget {
       this.onTap,
       this.click,
       this.onTapstar,
-      this.proirty, this.child})
+      this.proirty, this.child, this.des})
       : super(key: key);
   final onTapstar;
 
@@ -461,7 +317,7 @@ class CartTask extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.all(4),
+        padding: EdgeInsets.all(8),
         decoration: BoxDecoration(
             boxShadow: [BoxShadow(color: Colors.black26)],
             color: Colors.white,
@@ -486,18 +342,34 @@ class CartTask extends StatelessWidget {
             ExpandedSection(
               child: Column(
                 children: [
-
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 12),
+                    padding: EdgeInsets.symmetric(horizontal: 8),
                     child: Divider(
                       color: Colors.black12,
                     ),
                   ),
-                  Container(
-                  //  height: ,
-                    // decoration: Bo,
-                    //   color: Colors.grey[100],
-                    child: child
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      des==null?Container():
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(des.description=='false'?'':des.description, style: MyTheme.bodyTextTask),
+                          ),
+                      des==null?Container():  Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                       children: [
+                         Container(height: .5, color:Colors.black12,width: MediaQuery.of(context).size.width/2.7),
+                         Padding(
+                           padding: const EdgeInsets.symmetric(horizontal: 5),
+                           child: ContentApp(code: "logNote", style: MyTheme.bodyTextTask,),
+                         ),
+                         Expanded(child: Container(height: .5,color:Colors.black12,width: MediaQuery.of(context).size.width/2.7)),
+                       ],
+                     ),
+                      child,
+
+                    ],
                   ),
                 ],
               ),
@@ -525,45 +397,44 @@ List listOftask(String s, sList, tList) {
 }
 
 class TaskNote extends StatelessWidget {
-  final List<Note> note;
-
-  const TaskNote({Key key, this.note}) : super(key: key);
-
+   List<Note> note=List();
+   TaskNote({Key key, this.note}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    List items =
-        List.generate(note.length, (index) => MessageItem(note[index], true));
-    return ListView.separated(
-      separatorBuilder: (context, index) => Padding(
-        padding: EdgeInsets.symmetric(horizontal: 12),
-        child: Divider(
-          color: Colors.black12,
-        ),
-      ),
-      itemCount: items.length,
-      itemBuilder: (context, index) {
-        final item = items[index];
-        return Container(
-          padding: EdgeInsets.all(12),
-          color: MyTheme.kAccentColor,
-          child: ListTile(
-            dense: false,
-            leading: CircleAvatar(
-                radius: 18,
-                backgroundColor: MyTheme.kPrimaryColorVariant,
-                child: Icon(
-                  Icons.person,
-                  color: Colors.white,
-                )),
-            title: item.buildTitle(context),
-            subtitle: Text(
-              note[index].messege,
-              style: MyTheme.bodyTextMessage,
-            ), //item.buildSubtitle(context),
-            // trailing: item.buildTrailing(context),
+    List items = List.generate(note.length, (index) => MessageItem(note[index], true));
+    return
+    Container(
+      height: note.length*90.0,
+      child: ListView.separated(
+        separatorBuilder: (context, index) => Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8),
+          child: Divider(
+            color: Colors.black12,
           ),
-        );
-      },
+        ),
+        itemCount: items.length,
+        itemBuilder: (context, index) {
+          final item = items[index];
+          return //note[index].body.length>1?
+          Container(
+            padding: EdgeInsets.only(top: 8),
+            color: MyTheme.kAccentColor,
+            child: ListTile(
+              dense: true,
+              title: item.buildTitle(context),
+              subtitle: Text(
+                note[index].body,
+                style: MyTheme.bodyTextMessage,
+              ), //item.buildSubtitle(context)
+             //  trailing:item.buildLeading(context),
+            ),
+          );
+             /* :Container(
+            height: 100,
+            child: Text('empty notes..'),
+          );*/
+        },
+      ),
     );
   }
 }

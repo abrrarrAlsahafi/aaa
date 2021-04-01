@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:management_app/services/emom_api.dart';
 
+import 'note.dart';
+
 class Task {
   int taskId;
   String taskName;
-  String desc;
   String assignedTo;
-  bool taskStage;
+  String taskStage;
   String project;
   String createDate;
   String createBy;
+  List<Note>notes;
+  String description;
+
   Task(
       {this.taskId,
         this.taskName,
@@ -17,16 +21,19 @@ class Task {
         this.taskStage,
         this.project,
         this.createDate,
-        this.createBy});
+        this.createBy,
+        this.description,
+      this.notes});
 
   Task.fromJson(Map<String, dynamic> json) {
     taskId = json['task_id'];
     taskName = json['task_name'];
-    assignedTo = json['assigned_to'];
-    taskStage = json['task_stage']=="true"?true:false;
+    assignedTo = json['assigned_to'].toString();
+    taskStage = json['task_stage']==true?'true':'false';
     project = json['project'];
     createDate = json['create_date'];
     createBy = json['create_by'];
+    description = json['description'].toString();
   }
 
   Map<String, dynamic> toJson() {
@@ -38,6 +45,7 @@ class Task {
     data['project'] = this.project;
     data['create_date'] = this.createDate;
     data['create_by'] = this.createBy;
+    data['description'] = this.description;
     return data;
   }
 }
@@ -51,10 +59,11 @@ class TaskModel with ChangeNotifier {
     return userTasks;
   }
 
-  Future<void> creatNewTask(createTask,projectid ) async {
-    await EmomApi().createTask(taskName: createTask,projId: projectid);
+  Future<int> creatNewTask(createTask,projectid ) async {
+   int taskId= await EmomApi().createTask(taskName: createTask,projId: projectid);
+   print('id $taskId');
       getUserTasks(projectid);
-
+return taskId;
   }
 
 
@@ -68,4 +77,16 @@ class TaskModel with ChangeNotifier {
     await EmomApi().assignTask(uid:uid, tid: tid);
 
   }
+
+
+  Future<List<Note>> viewLogNote() async{
+
+    userTasks.forEach((element) async {
+      element.notes= await EmomApi().veiwLogNote(tid: element.taskId);
+    }) ;
+    print('logNote .. ${userTasks[0].notes}');
+
+
+  }
+
 }

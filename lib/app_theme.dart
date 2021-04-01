@@ -28,6 +28,12 @@ class MyTheme {
     fontWeight: FontWeight.bold,
     //letterSpacing: 1.5,
   );
+  static final TextStyle dateStyle = TextStyle(
+    color: Colors.black38,
+    fontSize: ScreenUtil().setSp(10, allowFontScalingSelf: true),
+    fontWeight: FontWeight.bold,
+    //letterSpacing: 1.5,
+  );
   static final TextStyle bodyText1 = TextStyle(
       color: MyTheme.kPrimaryColorVariant,
       fontSize: ScreenUtil().setSp(18, allowFontScalingSelf: true),
@@ -38,8 +44,7 @@ class MyTheme {
       fontSize: ScreenUtil().setSp(14, allowFontScalingSelf: true),
       fontWeight: FontWeight.bold);
   static final TextStyle bodyTextMessage = TextStyle(
-      fontSize: ScreenUtil().setSp(13, allowFontScalingSelf: true),
-      letterSpacing: 1.5,
+      fontSize: ScreenUtil().setSp(11, allowFontScalingSelf: true),
       fontWeight: FontWeight.w600);
   static final TextStyle bodyTextTask = TextStyle(
     fontSize: ScreenUtil().setSp(13, allowFontScalingSelf: true),

@@ -6,6 +6,7 @@ import 'package:management_app/app_theme.dart';
 import 'package:management_app/model/meetings.dart';
 import 'package:management_app/model/topic.dart';
 import 'package:management_app/model/user.dart';
+import 'package:management_app/widget/alert_dialog_widget.dart';
 import 'package:management_app/widget/expanded_selection.dart';
 import 'package:management_app/widget/slide_left.dart';
 import 'package:management_app/widget/slide_right.dart';

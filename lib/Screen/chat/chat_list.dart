@@ -7,6 +7,7 @@ import 'package:management_app/generated/I10n.dart';
 import 'package:management_app/model/channal.dart';
 import 'package:management_app/model/folowing.dart';
 import 'package:management_app/model/massege.dart';
+import 'package:management_app/model/note.dart';
 import 'package:management_app/model/user.dart';
 import 'package:management_app/widget/bulid_memberimage.dart';
 import 'package:management_app/widget/content_translate.dart';
@@ -225,11 +226,24 @@ class MessageItem implements ListItem {
   Widget buildLeading(BuildContext context) => MembertImage(item: item);
 
   Widget buildTitle(BuildContext context) {
-    // print(item);
-    return Text(
-      item.name, //item[index].name,
-      style: MyTheme.heading2,
-    );
+    if(item.runtimeType==Note){
+      return Row(
+        children: [
+          Text(
+            item.user,
+            style: MyTheme.heading2,
+          ),
+          SizedBox(width: 10),
+          Text("-  ${DateFormat.yMMMd().format(DateTime.parse(item.date))}", style: MyTheme.dateStyle)
+        ],
+      );
+    }else
+    {
+      return Text(
+         item.name, //item[index].name,
+        style: MyTheme.heading2,
+      );
+    }
   }
 
   Widget buildSubtitle(BuildContext context) {

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:management_app/model/channal.dart';
 import 'package:management_app/model/folowing.dart';
 import 'package:management_app/model/massege.dart';
+import 'package:management_app/model/note.dart';
 import 'package:management_app/model/project.dart';
 import 'package:management_app/model/task.dart';
 import 'package:management_app/model/user.dart';
@@ -256,7 +257,11 @@ class EmomApi implements BaseServices {
           list.add(Task.fromJson(item));
         }
       }
-      // print('');
+      list.forEach((element) async {
+        element.notes=await veiwLogNote(tid: element.taskId);
+        print('note ${element.notes}');
+      });
+
       return list;
     } catch (e) {
       rethrow;
@@ -333,8 +338,7 @@ class EmomApi implements BaseServices {
     }
   }
 
-  Future<void> createTask({Task taskName, int projId}) async {
-    //print('$projId');
+  Future<int> createTask({Task taskName, int projId}) async {
     SharedPreferences localStorage = await SharedPreferences.getInstance();
     String id = localStorage.get('session_id');
     try {
@@ -343,18 +347,16 @@ class EmomApi implements BaseServices {
         headers: _setHeaders(id),
         body: convert.jsonEncode({
           "jsonrpc": "2.0",
-          "params": {"task_name": "${taskName.taskName}", "project_id":projId, "description":"${taskName.desc}"}
+          "params": {"task_name": "${taskName.taskName}", "project_id":projId, "description":"${taskName.description}"}
         }),
       );
       final body = json.decode(response.body);
       if (response.statusCode == 200) {
         String strNum = "${body['result'].toString()}";
         final iReg = RegExp(r'(\d+)');
-        String s = iReg.allMatches(strNum).map((m) => m.group(0)).join(' ');
-     //   var newid = int.parse(s.substring(4));
-        print("body: ${s.substring(5)}");
-      //  print(iReg.allMatches(strNum).map((m) => m.group(0)).join(' '));
-       // return newid;
+        String s = iReg.allMatches(strNum).map((m) => m.group(0)).join(' ').substring(4);
+        print("body: ${s}");
+   return int.parse(s);
       }
     } catch (e) {
       rethrow;
@@ -397,7 +399,6 @@ class EmomApi implements BaseServices {
         'Accept': 'application/json',
         'Cookie': 'frontend_lang=en_US; session_id=$id'});
 
-   // print("response add member ${res.body}");
   }
 
   @override
@@ -415,9 +416,7 @@ class EmomApi implements BaseServices {
           'Accept': 'application/json',
           'Cookie': 'frontend_lang=en_US; session_id=$id'
         }
-        //{'Cookie': 'frontend_lang=en_US; session_id=$id'}
         );
-   // print(res.body);
   }
 
   @override
@@ -441,14 +440,38 @@ class EmomApi implements BaseServices {
           },
         ),
       );
-    //  print("Assigned task ${response.body}");
-    //  if (response.statusCode == 200)
-          // print("Assigned task ${response.body}"
-      //  );
 
     } catch (e) {
       rethrow;
     }
     }
 
+
+
+@override
+Future<List<Note>> veiwLogNote({tid}) async {
+  // TODO: implement assignTask
+  SharedPreferences localStorage = await SharedPreferences.getInstance();
+  String id = localStorage.get('session_id');
+  try {
+    var response = await http.get(
+      "${_client}project/get_task_notes?task_id=$tid",
+        headers: {'Cookie': 'frontend_lang=en_US; session_id=$id'});
+    List<Note> list = [];
+
+    if (response.statusCode == 200) {
+      for (var item in convert.jsonDecode(response.body)["data"]) {
+        list.add(Note.fromJson(item));
+      }
+    }
+   // print('note length  ${list.length}');
+
+    return list;
+
+  } catch (e) {
+    rethrow;
+  }
 }
+
+}
+

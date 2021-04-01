@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:management_app/Screen/chat/chat_info.dart';
 import 'package:management_app/generated/I10n.dart';
 import 'package:management_app/model/channal.dart';
@@ -101,11 +100,6 @@ class _MyDirectChatDetailPageState extends State<MyDirectChatDetailPage> {
     }
   }
 
-/*
-  void setStateIfMounted(f) {
-    if (mounted) setState(f);
-  }
-*/
   @override
   void dispose() {
     super.dispose();

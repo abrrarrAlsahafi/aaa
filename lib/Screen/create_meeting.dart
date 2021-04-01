@@ -4,6 +4,7 @@ import 'package:management_app/generated/I10n.dart';
 import 'package:management_app/model/meettings.dart';
 import 'package:management_app/model/project.dart';
 import 'package:management_app/model/task.dart';
+import 'package:management_app/model/user.dart';
 import 'package:management_app/widget/content_translate.dart';
 import 'package:management_app/widget/textfild_wedjet.dart';
 import 'package:flutter/material.dart';
@@ -301,13 +302,14 @@ class _CreateScreenState extends State<CreateScreen> {
     }
     return items;
   }
-
+  bool isManeger=false;
   @override
   Widget build(BuildContext context) {
     if (widget.item.runtimeType == Task) return buildTaskForm();
   }
 
   buildTaskForm() {
+
     final focus = FocusScope.of(context);
     return Scaffold(
       appBar: AppBar(
@@ -360,11 +362,11 @@ class _CreateScreenState extends State<CreateScreen> {
                   },
                   onSave: (String value) {
                     // widget.isTask? _task.desc=value:
-                    _task.desc = value;
+                    _task.description = value;
                   },
                   hintText: S.of(context).description,
                   suffixIcon: null),
-              TextFormFieldWidget(
+             /* isManeger? TextFormFieldWidget(
                   textInputAction: TextInputAction.next,
                   onEditingComplete: () => focus.nextFocus(),
                   onChanged: (str) {
@@ -383,7 +385,8 @@ class _CreateScreenState extends State<CreateScreen> {
                     _task.assignedTo = value;
                   },
                   hintText: S.of(context).assignedTo,
-                  suffixIcon: null),
+                  suffixIcon: null):
+              Container(),*/
             ],
           ),
         ),
@@ -394,8 +397,7 @@ class _CreateScreenState extends State<CreateScreen> {
           if (_formKey.currentState.validate()) {
             _formKey.currentState.save();
 
-        // int id=
-         await Provider.of<TaskModel>(context, listen: false)
+       int id=  await Provider.of<TaskModel>(context, listen: false)
                 .creatNewTask(_task, widget.projectid );
             Provider.of<TaskModel>(context, listen: false).userTasks.add(_task);
             //await Provider.of<TaskModel>(context,listen: false).getUserTasks(widget.projectid);

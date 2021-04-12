@@ -41,12 +41,7 @@ class _ProjectsState extends State<Projects> {
   }
 
   getMyProjects()  {
-  //  WidgetsBinding.instance.addPostFrameCallback((_) async {
     _userDetails= Provider.of<ProjectModel>(context, listen: false).userProject;
-  //  Provider.of<ProjectModel>(context, listen: false).projectManegerName(context);
-     // setState(() { });
-    //});
-
   }
 
   onSearchTextChanged(String text) async {
@@ -58,7 +53,8 @@ class _ProjectsState extends State<Projects> {
 
     _userDetails.forEach((userDetail) {
       if (userDetail.name.contains(text) ||
-          userDetail.name.toLowerCase().contains(text))
+          userDetail.name.toLowerCase().contains(text)||
+          userDetail.name.toUpperCase().contains(text))
         _searchResult.add(userDetail);
     });
     setState(() {});
@@ -76,11 +72,18 @@ class _ProjectsState extends State<Projects> {
       fullscreenDialog: true,)
     );
 
-    AppModel().config(context);
 
       if(result) {
-        Scaffold.of(context).showSnackBar(SnackBar(
-          content: Text("there is new task added to ${project.name}", style: MyTheme.Snacbartext,), duration: Duration(seconds: 4),backgroundColor: MyTheme.kUnreadChatBG,));
+        AppModel().config(context);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Row(
+            children: [
+              ContentApp(
+                 code: 'New',
+                 style: MyTheme.Snacbartext),
+              Text('${project.name}',style: MyTheme.Snacbartext)
+            ],
+          ), duration: Duration(seconds: 4),backgroundColor: MyTheme.kUnreadChatBG,));
       }//return result;
   }
     @override

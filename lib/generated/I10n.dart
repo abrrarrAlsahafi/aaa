@@ -56,7 +56,7 @@ class S {
   }
 
   String get search {
-    return localizedValues['searchPbar3'];
+    return localizedValues['search'];
   }
 
   String get username {
@@ -165,6 +165,7 @@ class S {
   String get welcomems {
     return localizedValues['welcomems'];
   }
+
 
 }
 

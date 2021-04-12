@@ -133,8 +133,8 @@ class _MeetingsScreenState extends State<MeetingsScreen> {
                           print("res $res");
                           if(res=="true"){
                             setState(() {
-                              String st= checkStage(meetings[index]);
-                              bool action=checkAction(meetings[index]);
+                               st= checkStage(meetings[index]);
+                               action=checkAction(meetings[index]);
                             });
                           }
                         } else if (direction == DismissDirection.startToEnd&&isMember) {

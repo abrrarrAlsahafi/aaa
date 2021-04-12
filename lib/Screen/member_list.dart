@@ -81,7 +81,7 @@ class _MembersListState extends State<MembersList> {
   }
 
   List userSelected() {
-    List usersSelected = List();
+    List usersSelected =[];
     for (int i = 0; i < items.length; i++) {
       // print("${isChecked[i]}, $i");
       if (isChecked[i]) {

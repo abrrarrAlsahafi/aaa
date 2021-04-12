@@ -230,9 +230,10 @@ class EmomApi implements BaseServices {
       if (response.statusCode == 200) {
         for (var item in convert.jsonDecode(response.body)["data"]) {
           list.add(Chat.fromJson(item));
-        }
-        //  saveToLocal(list, 'chat_list');
+          print("chat item.. ${item}");
 
+        }
+print("chat list.. ${list}");
       }
 
       return list;
@@ -382,8 +383,9 @@ class EmomApi implements BaseServices {
           "${_client}project/get_my_projects",
           headers: {
             'Cookie': 'frontend_lang=en_US; session_id=$id'});
-      List<Project> myProject = List();
+      List<Project> myProject =[];
       // final body = json.decode(response.body);
+      print(response);
       if (response.statusCode == 200) {
         for (var item in convert.jsonDecode(response.body)["data"]) {
           myProject.add(Project.fromJson(item));

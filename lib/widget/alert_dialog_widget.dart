@@ -52,7 +52,7 @@ class _AlertDialogPMState extends State<AlertDialogPM> {
           width: MediaQuery.of(context).size.width / 5, //double.minPositive,
           height: MediaQuery.of(context).size.height / 2.3,
           child: widget.dearection
-              ? Provider.of<UserModel>(context, listen: false).user.isAdmin
+             // ? Provider.of<UserModel>(context, listen: false).user.isAdmin
                   ? Column(
                       children: [
                         Divider(
@@ -113,7 +113,7 @@ class _AlertDialogPMState extends State<AlertDialogPM> {
                       ],
                     )
                   : alertDialogAddnote()
-              : alertDialogAddnote(),
+             // : alertDialogAddnote(),
         ));
   }
 

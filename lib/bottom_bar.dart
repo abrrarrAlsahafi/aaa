@@ -1,17 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:management_app/Screen/login_page.dart';
 import 'package:management_app/Screen/project.dart';
 import 'package:management_app/app_theme.dart';
-import 'package:management_app/model/folowing.dart';
 import 'package:management_app/widget/my_tab_bar.dart';
 import 'package:provider/provider.dart';
 import 'Screen/board.dart';
 import 'Screen/chat/chat_list.dart';
-import 'Screen/tasks.dart';
-import 'common/constant.dart';
-import 'generated/I10n.dart';
-import 'model/app_model.dart';
+
 import 'model/channal.dart';
 import 'model/massege.dart';
 import 'model/user.dart';
@@ -64,7 +59,6 @@ class _BottomBarState extends State<BottomBar> with TickerProviderStateMixin {
     });
   }
 
-/**/
   @override
   void setState(fn) {
     if (mounted) {

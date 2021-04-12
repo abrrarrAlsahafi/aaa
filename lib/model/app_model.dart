@@ -58,7 +58,7 @@ class AppModel extends ChangeNotifier {
         .getChannalsHistory();
 
     await Provider.of<FollowingModel>(context, listen: false)
-        .getfollowingList();
+        .getfollowingList(context);
     await Provider.of<MassegesContent>(context, listen: false).gitAllMessagees(context);
     await Provider.of<ProjectModel>(context, listen: false).getUserProjects();
    // Provider.of<ProjectModel>(context, listen: false).projectManegerName(context);

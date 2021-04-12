@@ -79,7 +79,7 @@ class _BoardScreenState extends State<BoardScreen> {
     AppModel().config(context);
 
     if (result) {
-      Scaffold.of(context).showSnackBar(SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(
           "there is new task added to ${board.name}",
           style: MyTheme.Snacbartext,

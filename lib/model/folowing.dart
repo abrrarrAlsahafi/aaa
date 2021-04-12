@@ -31,11 +31,9 @@ class FollowingModel extends ChangeNotifier {
   List<Folowing> followList;
   Folowing isAdmin;
   FollowingModel(this.followList);
-  getfollowingList() async {
+  getfollowingList(context) async {
     followList = await EmomApi().getfollowingList();
- followList.forEach((element) {
-   //followList.
- });
+ followList.removeWhere((element)=>element.id==Provider.of<UserModel>(context,listen: false).user.uid);
   }
 
   List<Folowing> channalMember;

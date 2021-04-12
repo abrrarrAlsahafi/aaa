@@ -397,9 +397,9 @@ class _MyDirectChatDetailPageState extends State<MyDirectChatDetailPage> {
   }
 
   buildBody() {
-    // print(myMessages);
+     print("new chat ${widget.newChat}");
     return WillPopScope(
-      onWillPop: () async => false,
+      onWillPop: () async => widget.newChat?false:true,//false,
       child: GestureDetector(
         onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
         child: Container(

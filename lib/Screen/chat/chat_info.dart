@@ -92,7 +92,7 @@ bool newMember=false;
         // print("$b");
        if(newMember)
        {
-         Scaffold.of(context).showSnackBar(SnackBar(
+         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
            content: Text("there is new member added to ${widget.sender.name.toString()}",
              style: MyTheme.Snacbartext,),
            duration: Duration(seconds: 4),

@@ -66,7 +66,7 @@
   "addMember": "Add Participants",
   "progectManeger": "Dirctor",
 "noTask": "There is no Task you can Add one",
-  "editor": "Editor",
+  "editor": "Editor","New": "New Task has been added",
   "approval": "Approval",
 "reply":"Replay",
   "logNote": "Notes",
@@ -79,6 +79,8 @@
   "noMeeting": "This board didn't have any sessions",
   "recom": "Recommendations",
   "sours": "Sours",
-"reject": ""
+"reject": "",
+  "search": "Search"
+
 }
 

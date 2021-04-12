@@ -32,6 +32,8 @@ environment:
   sdk: ">=2.7.0 <3.0.0"
 
 dependencies:
+  change_app_package_name: ^1.0.0
+
   #flutter_local_notifications: ^1.4.4+2
   geolocator:
   connectivity: ^0.4.8+6

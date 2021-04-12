@@ -51,13 +51,6 @@ class _ChatListState extends State<ChatList> with TickerProviderStateMixin {
         .totalNewMessages;
   }
 
-/*
-  @override
-  void setState(fn) {
-    if (mounted) {
-      super.setState(fn);
-    }
-  }*/
 
   @override
   void dispose() {
@@ -72,7 +65,6 @@ class _ChatListState extends State<ChatList> with TickerProviderStateMixin {
             chatHestoryList.length,
             (i) => MessageItem(chatHestoryList[i], false),
           );
-    //setState(() {});
   }
 
   onSearchTextChanged(String text) async {
@@ -84,7 +76,7 @@ class _ChatListState extends State<ChatList> with TickerProviderStateMixin {
 
     chatHestoryList.forEach((userDetail) {
       if (userDetail.name.contains(text) ||
-          userDetail.lastMessage.contains(text))
+          userDetail.lastMessage.contains(text)|| userDetail.name.toUpperCase().contains(text))
         _searchResult.add(MessageItem(userDetail, null));
     });
 
@@ -466,6 +458,7 @@ class _ListUsersState extends State<ListUsers> {
   @override
   void initState() {
     listFolow = Provider.of<FollowingModel>(context, listen: false).followList;
+
     items = List.generate(
       listFolow.length,
       (i) => MessageItem(listFolow[i], null),

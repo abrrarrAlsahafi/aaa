@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -82,9 +81,6 @@ class _MyAppState extends State<MyApp> {
 bool tap=false;
   @override
   Widget build(BuildContext context) {
-    //String strNum= "{\"code\": 200, \"message\": \"Channel Created\", \"channel_id\": 32}";
-
-  //  print(i);
     if (this._locale == null) {
       return Container(
         child: Center(

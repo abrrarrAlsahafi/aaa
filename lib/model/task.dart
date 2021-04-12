@@ -29,7 +29,7 @@ class Task {
     taskId = json['task_id'];
     taskName = json['task_name'];
     assignedTo = json['assigned_to'].toString();
-    taskStage = json['task_stage']==true?'true':'false';
+    taskStage = json['task_stage'].toString()=='false'?'None':json['task_stage'];
     project = json['project'];
     createDate = json['create_date'];
     createBy = json['create_by'];
@@ -56,6 +56,7 @@ class TaskModel with ChangeNotifier {
   TaskModel(this.userTasks);
   getUserTasks(projectid) async {
     userTasks= await EmomApi().getUserTask(projectid);
+    orderTaskByStage();
     return userTasks;
   }
 
@@ -86,6 +87,15 @@ return taskId;
     }) ;
     print('logNote .. ${userTasks[0].notes}');
 
+
+  }
+
+  void orderTaskByStage() {
+    userTasks.sort((a,b) =>b.createDate.compareTo(a.createDate)
+    // if( a.taskStage=='Done'||  a.taskStage=='Close'|| a.taskStage=='done'){
+
+     //} }
+   );
 
   }
 

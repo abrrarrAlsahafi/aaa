@@ -1,11 +1,12 @@
 import 'dart:convert' as convert;
 import 'dart:convert';
-import 'dart:io';
+import 'package:management_app/model/board.dart';
 import 'package:management_app/model/channal.dart';
 import 'package:management_app/model/folowing.dart';
 import 'package:management_app/model/massege.dart';
 import 'package:management_app/model/note.dart';
 import 'package:management_app/model/project.dart';
+import 'package:management_app/model/sessions.dart';
 import 'package:management_app/model/task.dart';
 import 'package:management_app/model/user.dart';
 import 'package:http/http.dart' as http;
@@ -15,7 +16,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'index.dart';
 
 class EmomApi implements BaseServices {
-  var _client = "http://demo.ewady.com/";
+  var _client = "https://ewady.com/";
   var _db = 'ewady_production'; //listMember
   connect() async {
     // _client = OdooClient('');
@@ -24,9 +25,9 @@ class EmomApi implements BaseServices {
     //  });
   }
 
-  _setHeaders(id) => {
+  _setHeaders(id) =>
+      {
         'Content-Type': 'application/json',
-        //'Accept': 'application/json',
         'Cookie': 'frontend_lang=en_US; session_id=$id'
       };
 
@@ -83,17 +84,20 @@ class EmomApi implements BaseServices {
 
   @override
   Future<void> logOut({username, password}) async {
+    print('$username  $password');
+    SharedPreferences localStorage = await SharedPreferences.getInstance();
+    String id = localStorage.get('session_id');
     try {
-      var response = await http.post('${_client}/session/destroy',
+      var response = await http.post('${_client}web/session/destroy',
           body: convert.jsonEncode({
             "jsonrpc": "2.0",
-            "params": {"db": _db, "login": username, "password": password}
+            "params": {"db": _db, "login": "$username", "password": "$password"}
           }),
-          headers: {
+          headers:_setHeaders(id)/* {
             'Content-Type': 'application/json',
             'Accept': 'application/json'
-          });
-     // print('code logout response : ${response.statusCode}, $response');
+          }*/);
+       print('code logout response : ${response.statusCode}, ${response.body}');
 //Todo:cose Provider
     } catch (err) {
       print('$err');
@@ -112,7 +116,7 @@ class EmomApi implements BaseServices {
   @override
   Future<dynamic> login({username, password}) async {
     connect();
-   // print(_client);
+    // print(_client);
     try {
       var response = await http.post("${_client}web/session/authenticate",
           body: convert.jsonEncode({
@@ -138,8 +142,8 @@ class EmomApi implements BaseServices {
       } else {
         final body = convert.jsonDecode(response.body);
         return Exception(body["message"] =
-                body['error']['data']['message'] //: "Can not get token"
-            );
+        body['error']['data']['message'] //: "Can not get token"
+        );
       } /**/ // Network is unreachable,
     } catch (err) {
       // print("network error $err");
@@ -149,7 +153,8 @@ class EmomApi implements BaseServices {
   }
 
   @override
-  Future<int> createNewChannal(String channelName, List memberIds, isChat, isPrivate) async {
+  Future<int> createNewChannal(String channelName, List memberIds, isChat,
+      isPrivate) async {
     SharedPreferences localStorage = await SharedPreferences.getInstance();
     String id = localStorage.get('session_id');
     try {
@@ -242,23 +247,23 @@ class EmomApi implements BaseServices {
     String id = localStorage.get('session_id');
     try {
       final response =
-          await http.get("${_client}project/get_task_details?project_id=$projectId",
-              headers: {
-                'Cookie': 'frontend_lang=en_US; session_id=$id'
+      await http.get("${_client}project/get_task_details?project_id=$projectId",
+          headers: {
+            'Cookie': 'frontend_lang=en_US; session_id=$id'
           });
 
       List<Task> list = [];
-    //  print("${response.body}");
+      //  print("${response.body}");
 
       // var respData = json.decode(response.body);
-     // print(response.body);
+      // print(response.body);
       if (response.statusCode == 200) {
         for (var item in convert.jsonDecode(response.body)["data"]) {
           list.add(Task.fromJson(item));
         }
       }
       list.forEach((element) async {
-        element.notes=await veiwLogNote(tid: element.taskId);
+        element.notes = await veiwLogNote(tid: element.taskId);
         print('note ${element.notes}');
       });
 
@@ -305,7 +310,7 @@ class EmomApi implements BaseServices {
           list.add(Massege.fromJson(item));
         }
       }
-    //  print('response 1111 ${response.body}');
+      //  print('response 1111 ${response.body}');
 
       return list;
     } catch (e) {
@@ -347,16 +352,22 @@ class EmomApi implements BaseServices {
         headers: _setHeaders(id),
         body: convert.jsonEncode({
           "jsonrpc": "2.0",
-          "params": {"task_name": "${taskName.taskName}", "project_id":projId, "description":"${taskName.description}"}
+          "params": {
+            "task_name": "${taskName.taskName}",
+            "project_id": projId,
+            "description": "${taskName.description}"
+          }
         }),
       );
       final body = json.decode(response.body);
       if (response.statusCode == 200) {
         String strNum = "${body['result'].toString()}";
         final iReg = RegExp(r'(\d+)');
-        String s = iReg.allMatches(strNum).map((m) => m.group(0)).join(' ').substring(4);
+        String s = iReg.allMatches(strNum).map((m) => m.group(0))
+            .join(' ')
+            .substring(4);
         print("body: ${s}");
-   return int.parse(s);
+        return int.parse(s);
       }
     } catch (e) {
       rethrow;
@@ -384,9 +395,32 @@ class EmomApi implements BaseServices {
     }
   }
 
+  Future<List<Boards>> getMyBoards() async {
+    SharedPreferences localStorage = await SharedPreferences.getInstance();
+    String id = localStorage.get('session_id');
+    try {
+      http.Response response = await http.get(
+          "${_client}mom/get_my_boards",
+          headers: {
+            'Cookie': 'frontend_lang=en_US; session_id=$id'});
+      List<Boards> myBoards = List();
+      //print("item.... ${response.body}");
+
+      // final body = json.decode(response.body);
+      if (response.statusCode == 200) {
+        for (var item in convert.jsonDecode(response.body)["boards"]) {
+          myBoards.add(Boards.fromJson(item));
+        }
+      }
+      return myBoards;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   @override
   Future<void> addMembers(channelId, memberId) async {
-  //  print("$channelId , $memberId ");
+    //  print("$channelId , $memberId ");
     SharedPreferences localStorage = await SharedPreferences.getInstance();
     String id = localStorage.get('session_id');
     var res = await http.post("${_client}chat/add_members",
@@ -395,14 +429,14 @@ class EmomApi implements BaseServices {
           "params": {"member_ids": memberId, "channel_id": channelId}
         }),
         headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Cookie': 'frontend_lang=en_US; session_id=$id'});
-
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Cookie': 'frontend_lang=en_US; session_id=$id'});
   }
 
   @override
-  Future<void> logNote(message, taskId) async {
+  Future<void> logNote({message, taskId}) async {
+    print('res ${message} $taskId');
 
     SharedPreferences localStorage = await SharedPreferences.getInstance();
     String id = localStorage.get('session_id');
@@ -416,23 +450,24 @@ class EmomApi implements BaseServices {
           'Accept': 'application/json',
           'Cookie': 'frontend_lang=en_US; session_id=$id'
         }
-        );
+    );
+    print('res ${res.body}');
   }
 
   @override
   Future<void> assignTask({uid, tid}) async {
-  //  print("$uid  task  $tid");
+    //  print("$uid  task  $tid");
     // TODO: implement assignTask
     SharedPreferences localStorage = await SharedPreferences.getInstance();
     String id = localStorage.get('session_id');
     try {
       var response = await http.post(
         "${_client}project/assign_task",
-        headers:{
+        headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
           'Cookie': 'session_id=$id'
-        },// _setHeaders(id),
+        }, // _setHeaders(id),
         body: convert.jsonEncode(
           {
             "jsonrpc": "2.0",
@@ -441,37 +476,202 @@ class EmomApi implements BaseServices {
         ),
       );
 
+      if(response.hashCode==200){
+      //  EmomApi().getMyProjects();
+      }
     } catch (e) {
       rethrow;
     }
-    }
-
-
-
-@override
-Future<List<Note>> veiwLogNote({tid}) async {
-  // TODO: implement assignTask
-  SharedPreferences localStorage = await SharedPreferences.getInstance();
-  String id = localStorage.get('session_id');
-  try {
-    var response = await http.get(
-      "${_client}project/get_task_notes?task_id=$tid",
-        headers: {'Cookie': 'frontend_lang=en_US; session_id=$id'});
-    List<Note> list = [];
-
-    if (response.statusCode == 200) {
-      for (var item in convert.jsonDecode(response.body)["data"]) {
-        list.add(Note.fromJson(item));
-      }
-    }
-   // print('note length  ${list.length}');
-
-    return list;
-
-  } catch (e) {
-    rethrow;
   }
-}
+
+
+  @override
+  Future<List<Note>> veiwLogNote({tid}) async {
+    // TODO: implement assignTask
+    SharedPreferences localStorage = await SharedPreferences.getInstance();
+    String id = localStorage.get('session_id');
+    try {
+      var response = await http.get(
+          "${_client}project/get_task_notes?task_id=$tid",
+          headers: {'Cookie': 'frontend_lang=en_US; session_id=$id'});
+      List<Note> list = [];
+
+      if (response.statusCode == 200) {
+        for (var item in convert.jsonDecode(response.body)["data"]) {
+          list.add(Note.fromJson(item));
+        }
+      }
+      // print('note length  ${list.length}');
+
+      return list;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+
+  @override
+  Future<List<Sessions>> getBoardSessions({boardId}) async {
+    //  print("id.. $boardId");
+
+    // TODO: implement assignTask
+    SharedPreferences localStorage = await SharedPreferences.getInstance();
+    String id = localStorage.get('session_id');
+    try {
+      var response = await http.get(
+          "${_client}mom/get_board_sessions?board_id=$boardId",
+          headers: {'Cookie': 'frontend_lang=en_US; session_id=$id'});
+      List<Sessions> list = [];
+        // print(response.body);
+
+      if (response.statusCode == 200) {
+        for (var item in convert.jsonDecode(response.body)["boards"]) {
+          list.add(Sessions.fromJson(item));
+        }
+      }
+       print('list   ${list}');
+
+      return list;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+
+  @override
+  Future<dynamic> actionSign({sessionId}) async {
+    SharedPreferences localStorage = await SharedPreferences.getInstance();
+    String id = localStorage.get('session_id');
+    try {
+      var response = await http.post("${_client}mom/action_sign",
+          body: convert.jsonEncode({
+            "jsonrpc": "2.0",
+            "params": {"db": _db,
+              "session_id": sessionId}
+          }),
+        headers: _setHeaders(id));//_setHeaders());
+     // updateCookie(response);
+    //  print("response.. ${response.body}");
+
+      final body = convert.jsonDecode(response.body)['result']['message'];
+     print("body.. ${body}");
+      return body.toString();
+     /**/ // Network is unreachable,
+    } catch (err) {
+      // print("network error $err");
+      return err;
+      // rethrow;
+    }
+  }
+
+
+
+  @override
+  Future<dynamic> actionDiscreet({sessionId, discreet}) async {
+    SharedPreferences localStorage = await SharedPreferences.getInstance();
+    String id = localStorage.get('session_id');
+    try {
+      var response = await http.post("${_client}mom/action_discreet",
+          body: convert.jsonEncode({
+            "jsonrpc": "2.0",
+            "params": {"db": _db,
+              "session_id": sessionId},
+            "discreet":"$discreet"
+          }),
+          headers: _setHeaders(id));//_setHeaders());
+      // updateCookie(response);
+      //  print("response.. ${response.body}");
+
+      final body = convert.jsonDecode(response.body)['result']['message'];
+      // print("body.. ${body}");
+      return body.toString();
+      /**/ // Network is unreachable,
+    } catch (err) {
+      // print("network error $err");
+      return err;
+      // rethrow;
+    }
+  }
+
+  @override
+  Future<dynamic> sendToManager({sessionId}) async {
+    SharedPreferences localStorage = await SharedPreferences.getInstance();
+    String id = localStorage.get('session_id');
+    try {
+      var response = await http.post("${_client}mom/send_to_manager",
+          body: convert.jsonEncode({
+            "jsonrpc": "2.0",
+            "params": {"db": _db,
+              "session_id": sessionId}
+          }),
+          headers: _setHeaders(id));//_setHeaders());
+      // updateCookie(response);
+      //  print("response.. ${response.body}");
+
+      final body = convert.jsonDecode(response.body)['result']['message'];
+      // print("body.. ${body}");
+      return body.toString();
+      /**/ // Network is unreachable,
+    } catch (err) {
+      // print("network error $err");
+      return err;
+      // rethrow;
+    }
+  }
+
+  @override
+  Future<dynamic> sendToMembers({sessionId}) async {
+    SharedPreferences localStorage = await SharedPreferences.getInstance();
+    String id = localStorage.get('session_id');
+    try {
+      var response = await http.post("${_client}mom/action_sign",
+          body: convert.jsonEncode({
+            "jsonrpc": "2.0",
+            "params": {"db": _db,
+              "session_id": sessionId}
+          }),
+          headers: _setHeaders(id));//_setHeaders());
+      // updateCookie(response);
+      //  print("response.. ${response.body}");
+
+      final body = convert.jsonDecode(response.body)['result']['message'];
+       print("body.. ${body}");
+      return body.toString();
+      /**/ // Network is unreachable,
+    } catch (err) {
+      // print("network error $err");
+      return err;
+      // rethrow;
+    }
+  }
+
+  @override
+  Future<dynamic> toApproved({sessionId}) async {
+    SharedPreferences localStorage = await SharedPreferences.getInstance();
+    String id = localStorage.get('session_id');
+    try {
+      var response = await http.post("${_client}mom/action_sign",
+          body: convert.jsonEncode({
+            "jsonrpc": "2.0",
+            "params": {"db": _db,
+              "session_id": sessionId}
+          }),
+          headers: _setHeaders(id));//_setHeaders());
+      // updateCookie(response);
+      //  print("response.. ${response.body}");
+
+      final body = convert.jsonDecode(response.body)['result']['message'];
+      // print("body.. ${body}");
+      return body.toString();
+      /**/ // Network is unreachable,
+    } catch (err) {
+      // print("network error $err");
+      return err;
+      // rethrow;
+    }
+  }
+
 
 }
+
 

@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'chat/chat_list.dart';
 
 class MembersList extends StatefulWidget {
-  List member;
+   List member;
   var admin;
 
   MembersList({Key key, this.member, this.admin}) : super(key: key);

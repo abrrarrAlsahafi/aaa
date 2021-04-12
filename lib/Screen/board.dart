@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:management_app/Screen/tasks.dart';
 import 'package:management_app/model/app_model.dart';
 import 'package:management_app/model/board.dart';
 import 'package:management_app/widget/card_list.dart';
-import 'package:management_app/widget/flat_action_botton_wedget.dart';
 import 'package:management_app/widget/search.dart';
 import 'package:management_app/widget/subtitel_wedget.dart';
+import 'package:provider/provider.dart';
 
 import '../app_theme.dart';
 import '../bottom_bar.dart';
@@ -16,7 +15,7 @@ class BoardScreen extends StatefulWidget {
   _BoardScreenState createState() => _BoardScreenState();
 }
 
-List<Board> meetings = List();
+List<Boards> meetings = [];
 
 class _BoardScreenState extends State<BoardScreen> {
   TextEditingController controller = new TextEditingController();
@@ -25,19 +24,25 @@ class _BoardScreenState extends State<BoardScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    meetings = List.generate(
-        4,
-        (index) => Board(
-              name: 'Board $index',
-              noOfTask: index,
-              managerName: 'description..',
-              create: DateTime.now(),
-              boardNumber: 12,
-              // 'AAA'
-            ));
-
-    _userDetails = meetings;
+   // meetings =
+    //_userDetails =
+        getMyProjects();// meetings;
   }
+  getMyProjects()  async {
+    //  WidgetsBinding.instance.addPostFrameCallback((_) async {
+    _userDetails = await Provider.of<BoardsModel>(context, listen: false).getUserBoards();
+
+    //  Provider.of<ProjectModel>(context, listen: false).projectManegerName(context);
+  setState(() {
+
+  });
+
+
+
+    //});
+
+  }
+
 
   onSearchTextChanged(String text) async {
     _searchResult.clear();
@@ -54,15 +59,16 @@ class _BoardScreenState extends State<BoardScreen> {
     setState(() {});
   }
 
-  List<Board> _searchResult = [];
-  List<Board> _userDetails = [];
+  List<Boards> _searchResult = [];
+  List<Boards> _userDetails = [];
 
-  goToSecondScreen({project}) async {
+  goToSecondScreen({Boards board}) async {
     var result = await Navigator.push(
         context,
         new MaterialPageRoute(
           builder: (BuildContext context) => MeetingsScreen(
-            bordName: project.name,
+            title: board.name,
+            id:board.id
           ),
           //new SecondScreen(context),
           fullscreenDialog: true,
@@ -75,7 +81,7 @@ class _BoardScreenState extends State<BoardScreen> {
     if (result) {
       Scaffold.of(context).showSnackBar(SnackBar(
         content: Text(
-          "there is new task added to ${project.name}",
+          "there is new task added to ${board.name}",
           style: MyTheme.Snacbartext,
         ),
         duration: Duration(seconds: 4),
@@ -86,6 +92,7 @@ class _BoardScreenState extends State<BoardScreen> {
 
   @override
   Widget build(BuildContext context) {
+print(_userDetails);
     return Scaffold(
     //  floatingActionButton: FlatActionButtonWidget(  onPressed: (){},   icon: Icons.add,  ),
       body: Column(children: [
@@ -113,11 +120,11 @@ class _BoardScreenState extends State<BoardScreen> {
                     itemBuilder: (context, index) {
                       return GestureDetector(
                           onTap: () =>
-                              goToSecondScreen(project: _userDetails[index]),
+                              goToSecondScreen(board: _userDetails[index]),
                           child: CardListWidget(
                             countName: 'meetings',
                             countNumber: Text(
-                                '${_userDetails[index].noOfTask == null ? 0 : _userDetails[index].noOfTask}',
+                                '${_userDetails[index].sessionsCount == null ? 0 : _userDetails[index].sessionsCount}',
                                 style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold)),
@@ -143,14 +150,14 @@ class _BoardScreenState extends State<BoardScreen> {
                                             size: 15,
                                           ),
                                           title:
-                                              "${_userDetails[index].managerName}")),
+                                              "${_userDetails[index].description?_userDetails[index].description:''}")),
                                   SizedBox(height: 12),
 
                                   Container(
                                       child: SubTitelWidget(
                                           child: Icon(Icons.people_outline_rounded,color: Colors.grey[700], size: 15) ,
                                           title:
-                                              "${_userDetails[index].boardNumber}")),
+                                              "${_userDetails[index].membersCount}")),
                                 ],
                               ),
                             ),

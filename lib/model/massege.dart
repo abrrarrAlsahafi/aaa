@@ -66,10 +66,11 @@ class NewMessagesModel extends ChangeNotifier {
   // int totalm=-1;
   NewMessagesModel();
 
-  newMessagesList() async {
+  newMessagesList(context) async {
     newMessages = await EmomApi().newMasseges();
     if (newMessages.totalNewMessages > 0) {
-      await EmomApi().chatHistory();
+      await Provider.of<ChatModel>(context, listen: false)
+          .getChannalsHistory();
     }
     //sortchatlist
     // print("total messege ${newMessages.totalNewMessages}");

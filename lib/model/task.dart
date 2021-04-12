@@ -67,8 +67,8 @@ return taskId;
   }
 
 
-  Future<void> logNot(mas, id) async{
-   await EmomApi().logNote(mas, id);
+  Future<void> logNot({mas, id}) async{
+   await EmomApi().logNote(message: mas, taskId: id);
 
   }
 

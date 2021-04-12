@@ -51,16 +51,15 @@ class _BottomBarState extends State<BottomBar> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    AppModel().config(context);
     tabController = TabController(length: 3, vsync: this);
     tabController.addListener(() {
       onTabChange();
     });
-    Future.delayed(Duration(seconds: 5), () {
-      this.checkForNewSharedLists();
+    Future.delayed(Duration(seconds: 1), () {
+      this.checkForNewSharedLists(context);
     });
     timer = Timer.periodic(Duration(seconds: 5), (Timer t) {
-      checkForNewSharedLists();
+      checkForNewSharedLists(context);
       print('the total bottom bar $totalMessges');
     });
   }
@@ -75,17 +74,18 @@ class _BottomBarState extends State<BottomBar> with TickerProviderStateMixin {
   }
 
 
-  checkForNewSharedLists() async {
+  checkForNewSharedLists(context) async {
     // WidgetsBinding.instance.addPostFrameCallback((_) async {
     totalMessges = await Provider.of<NewMessagesModel>(context, listen: false)
-        .newMessagesList();
+        .newMessagesList(context);
+
     if (mounted) {
       setState(() {});
     }
 
-
     if(totalMessges>0){
-      getnewMasseges();
+      getnewMasseges(context);
+
     }
 
     // });
@@ -96,10 +96,10 @@ class _BottomBarState extends State<BottomBar> with TickerProviderStateMixin {
   }
 
 
-  getnewMasseges() {
-    checkForNewSharedLists();
+  getnewMasseges(context)  {
+    checkForNewSharedLists(context);
     if (Provider.of<NewMessagesModel>(context, listen: false).newMessages.totalNewMessages > 0) {
-      List<ChannelMessages> newMsList = Provider.of<NewMessagesModel>(context, listen: false).newMessages.channelMessages;
+      List<ChannelMessages> newMsList =  Provider.of<NewMessagesModel>(context, listen: false).newMessages.channelMessages;
       newMsList.forEach((element) {
         Provider.of<ChatModel>(context,listen: false).chatsList.forEach((e) {
           if (e.id == element.channelId) {
@@ -111,6 +111,7 @@ class _BottomBarState extends State<BottomBar> with TickerProviderStateMixin {
           }
           else {
             e.newMessage = false;
+           // Provider.of<ChatModel>(context, listen: false)
             Provider.of<ChatModel>(context, listen: false).orderByLastAction();
           }
         });
@@ -147,7 +148,7 @@ class _BottomBarState extends State<BottomBar> with TickerProviderStateMixin {
                   ),
                 );
               } else {
-                return   Column(
+                return Column(
                     children: [
                       MyTabBar(
                           tabController: tabController,
@@ -176,9 +177,9 @@ class _BottomBarState extends State<BottomBar> with TickerProviderStateMixin {
   appBar() {
     return AppBar(
       elevation: 0.5,
-      backgroundColor:Colors.white, //Color(0xff336699),
+      backgroundColor:Color(0xff336699),
       leading: IconButton(
-        icon: Icon(Icons.menu_outlined, color:MyTheme.kPrimaryColorVariant //Colors.white
+        icon: Icon(Icons.menu_outlined, color:Colors.white
         ),
         onPressed: () => Navigator.pushNamed(context, '/d'),
       ),
@@ -188,17 +189,16 @@ class _BottomBarState extends State<BottomBar> with TickerProviderStateMixin {
           child: Text("${Provider
               .of<UserModel>(context)
               .user
-              .name}",style: TextStyle(color: MyTheme.kPrimaryColorVariant),)),
+              .name}",style: TextStyle(color: Colors.white),)),
       actions: <Widget>[
         IconButton(
           icon: Icon(
             Icons.search,
-            color: MyTheme.kPrimaryColorVariant//Colors.white,
+            color:Colors.white,
           ),
           onPressed: () {
             setState(() {
               search = search ? false : true;
-              //  serchTask=serchTask?
             });
           },
         )

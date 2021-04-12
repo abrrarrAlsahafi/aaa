@@ -1,10 +1,9 @@
 import 'package:management_app/Screen/tasks.dart';
 import 'package:management_app/common/constant.dart';
 import 'package:management_app/generated/I10n.dart';
-import 'package:management_app/model/meettings.dart';
 import 'package:management_app/model/project.dart';
+import 'package:management_app/model/sessions.dart';
 import 'package:management_app/model/task.dart';
-import 'package:management_app/model/user.dart';
 import 'package:management_app/widget/content_translate.dart';
 import 'package:management_app/widget/textfild_wedjet.dart';
 import 'package:flutter/material.dart';
@@ -24,12 +23,12 @@ class CreateMeetings extends StatefulWidget {
 class _CreateMeetingsState extends State<CreateMeetings> {
   final _formKey = GlobalKey<FormState>();
   bool _autoValidate = false;
-  MeettingsModel _meettingsModel = MeettingsModel();
+  Sessions _meettingsModel = Sessions();
   Task _task = Task();
   String _selectedItem;
-  List<DropdownMenuItem<String>> _dropdownMenuItems;
+  //List<DropdownMenuItem<String>> _dropdownMenuItems;
   String projectName;
-  List<String> _dropdownItems = List();
+  List<String> _dropdownItems = [];
 
   _CreateMeetingsState();
 
@@ -90,7 +89,7 @@ class _CreateMeetingsState extends State<CreateMeetings> {
                 onSave: (String value) {
                   widget.isTask
                       ? _task.taskName = value
-                      : _meettingsModel.location = value;
+                      : _meettingsModel.name = value;
                 },
 
                 hintText: widget.isTask
@@ -145,7 +144,7 @@ class _CreateMeetingsState extends State<CreateMeetings> {
                         }
                       },
                       onSave: (String value) =>
-                          _meettingsModel.duration = value,
+                          _meettingsModel.date = value,
                       hintText: S.of(context).duration,
                     ),
               widget.isTask
@@ -165,7 +164,7 @@ class _CreateMeetingsState extends State<CreateMeetings> {
                         }
                       },
                       onSave: (String value) {
-                        _meettingsModel.members = value;
+                        _meettingsModel.editor =value;
                       },
 
                       hintText: S.of(context).member, //: str,
@@ -191,7 +190,7 @@ class _CreateMeetingsState extends State<CreateMeetings> {
                         }
                       },
                       onSave: (String value) {
-                        _meettingsModel.agenda = value;
+                        _meettingsModel.topics[0].name = value;
                       },
 
                       hintText: S.of(context).agenda, //: str,
@@ -217,7 +216,7 @@ class _CreateMeetingsState extends State<CreateMeetings> {
                         }
                       },
                       onSave: (String value) {
-                        _meettingsModel.agreement = value;
+                        _meettingsModel.topics[0].recommendation = value;
                       },
                       hintText: S.of(context).agreement,
                       suffixIcon:
@@ -242,7 +241,7 @@ class _CreateMeetingsState extends State<CreateMeetings> {
               expandList.add(false);
               Navigator.pop(context, true);
             } else {
-              _meettingsModel.state = 'Schedule';
+              _meettingsModel.stage = 'Schedule';
               // print(_meettingsModel.toString());
               Navigator.of(context).pop();
             }
@@ -399,11 +398,13 @@ class _CreateScreenState extends State<CreateScreen> {
 
        int id=  await Provider.of<TaskModel>(context, listen: false)
                 .creatNewTask(_task, widget.projectid );
-            Provider.of<TaskModel>(context, listen: false).userTasks.add(_task);
-            //await Provider.of<TaskModel>(context,listen: false).getUserTasks(widget.projectid);
+          //  Provider.of<TaskModel>(context, listen: false).userTasks.add(_task);
+           // await Provider.of<TaskModel>(context,listen: false).getUserTasks(widget.projectid);
 
             expandList.add(false);
+          //  Navigator.pushReplacementNamed(context, "/task");
             Navigator.pop(context, true);
+          //  setState(() {  addTask = result;  });
           } else {
             setState(() {
               _autoValidate = true;

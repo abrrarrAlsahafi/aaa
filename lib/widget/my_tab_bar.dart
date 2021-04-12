@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:management_app/model/massege.dart';
+import 'package:flutter_screenutil/screenutil.dart';
 import 'package:management_app/widget/content_translate.dart';
-import 'package:provider/provider.dart';
 import '../app_theme.dart';
 
 class MyTabBar extends StatelessWidget {
@@ -19,7 +17,7 @@ class MyTabBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: new BoxDecoration(
-        color: Colors.white, //background color of box
+        color:MyTheme.kPrimaryColorVariant, //Colors.white, //background color of box
 
       boxShadow: [
       BoxShadow(
@@ -45,12 +43,14 @@ class MyTabBar extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(Icons.chat,
-                        color: MyTheme.kPrimaryColorVariant, size: 23),
+                        color:Colors.white,// MyTheme.kPrimaryColorVariant,
+                        size: 23),
                     ContentApp(
                       code: "chat",
                       style: TextStyle(
-                        fontSize: 12,
-                        color: MyTheme.kPrimaryColorVariant,
+                        fontSize: ScreenUtil().setSp(10, allowFontScalingSelf: true),
+                        color: Colors.white,
+                        //MyTheme.kPrimaryColorVariant,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -77,7 +77,7 @@ class MyTabBar extends StatelessWidget {
                               shape: BoxShape.circle, color: Color(0xffe9a14e)),
                           child: Center(
                             child: Text(
-                              '${totalmassege}',
+                              '$totalmassege',
                               //  "    ${Provider.of<NewMessagesModel>(context).newMessages.totalNewMessages}",
                               style: TextStyle(
                                   color: MyTheme.kPrimaryColorVariant,
@@ -102,12 +102,13 @@ class MyTabBar extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(Icons.playlist_add_check_outlined,
-                        color: MyTheme.kPrimaryColorVariant, size: 25),
+                        color:Colors.white,// MyTheme.kPrimaryColorVariant,
+                        size: 25),
                     ContentApp(
                       code: "tasks",
                       style: TextStyle(
-                        fontSize: 12,
-                        color: MyTheme.kPrimaryColorVariant,
+                        fontSize: ScreenUtil().setSp(10, allowFontScalingSelf: true),
+                        color: Colors.white, //MyTheme.kPrimaryColorVariant,
 
                         fontWeight: FontWeight.w600,
                       ),
@@ -126,13 +127,14 @@ class MyTabBar extends StatelessWidget {
                   children: [
                     Image.asset('assets/boards_icon_active.png',
                         height: 19,//Icons.playlist_add_check_outlined,
-                        color: MyTheme.kPrimaryColorVariant),
-                    SizedBox(height: 6,),
+                        color: Colors.white, //MyTheme.kPrimaryColorVariant
+                    ),
+                    SizedBox(height: 6),
                     ContentApp(
                       code: "bords",
                       style: TextStyle(
-                        fontSize: 12,
-                        color: MyTheme.kPrimaryColorVariant,
+                        fontSize: ScreenUtil().setSp(10, allowFontScalingSelf: true),
+                        color: Colors.white, //MyTheme.kPrimaryColorVariant,
                         fontWeight: FontWeight.w600,
                       ),
                     ),

@@ -32,8 +32,8 @@ class UserModel with ChangeNotifier {
 
   Future<void> saveUser(User user) async {
     getUser();
-    // print('save user ${user.isAdmin}');
-    this.user = user;
+
+    this.user = user;print('save user ${user.pass}');
     final LocalStorage storage = LocalStorage("emomApp");
     try {
       // save to Preference
@@ -43,7 +43,7 @@ class UserModel with ChangeNotifier {
       final ready = await storage.ready;
       if (ready) {
         await storage.setItem(kLocalKey["userInfo"], user);
-        print("save ${user.isAdmin}");
+       // print("save ${user.isAdmin}");
       }
     } catch (err) {
       print(err);

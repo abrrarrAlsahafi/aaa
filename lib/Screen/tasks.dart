@@ -16,6 +16,7 @@ import 'package:management_app/widget/slide_left.dart';
 import 'package:management_app/widget/slide_right.dart';
 import 'package:provider/provider.dart';
 
+import '../main.dart';
 import 'chat/chat_list.dart';
 
 class TaskScreen extends StatefulWidget {
@@ -35,7 +36,7 @@ List<bool> expandList; //=[false,false,false];
 
 class _TaskScreenState extends State<TaskScreen> with TickerProviderStateMixin {
   String dropdownValue; //= 'New';
-  List listStageTask = List();
+  List listStageTask =[];
   bool _disposed = false;
   TabController _tabController;
   List<Task> taskList;
@@ -46,6 +47,7 @@ class _TaskScreenState extends State<TaskScreen> with TickerProviderStateMixin {
   //List<Note> note;
   @override
   void initState() {
+    projectid=widget.projectid;
     super.initState();
     taskHistory();
 
@@ -58,11 +60,28 @@ class _TaskScreenState extends State<TaskScreen> with TickerProviderStateMixin {
       }
     });
   }
+  goToSecondScreen(item,id) async {
+    var result = await Navigator.push(context, new MaterialPageRoute(
+      builder: (BuildContext context) => CreateScreen(
+        item: item,projectid: id,
+      ),
+      //new SecondScreen(context),
+      fullscreenDialog: true,)
+    );
 
+    //AppModel().config(context);
+
+    if(result) {
+      taskHistory();
+      setState(() {   addTask = true; });
+  //  Scaffold.of(context).widget.body;
+    }//return result;
+  }
   taskHistory() async {
     // print("frist $taskList");
     taskList = await Provider.of<TaskModel>(context, listen: false)
-        .getUserTasks(widget.projectid.id);
+        .getUserTasks(projectid.id//widget.projectid.id
+    );
   //  await Provider.of<TaskModel>(context, listen: false).viewLogNote();
 
     expandList = List.generate(taskList.length, (index) => false);
@@ -85,7 +104,7 @@ class _TaskScreenState extends State<TaskScreen> with TickerProviderStateMixin {
 
 
   bool addTask = false;
-
+  var result;
   @override
   Widget build(BuildContext context) {
 
@@ -93,35 +112,26 @@ class _TaskScreenState extends State<TaskScreen> with TickerProviderStateMixin {
       onWillPop: () async => false,
       child: Scaffold(
           appBar: AppBar(
-            backgroundColor: Colors.white,
+            backgroundColor: MyTheme.kPrimaryColorVariant,
             leading: Container(
                 child: IconButton(
                     icon: Icon(
                       Icons.arrow_back_ios,
                     ),
-                    color: MyTheme.kPrimaryColorVariant,
+                    color: Colors.white,
                     onPressed: () {
+                      print("addtask $addTask");
                       Navigator.pop(context, addTask);
                     })),
-            title: Text(widget.projectid.name, style: MyTheme.kAppTitle),
+            title: Text(projectid.name,//widget.projectid.name,
+                style: MyTheme.kAppTitle),
           ),
           backgroundColor: MyTheme.kAccentColor,
           floatingActionButton: FlatActionButtonWidget(
             icon: Icons.playlist_add,
-            onPressed: () async {
-              var result = await Navigator.push(
-                  context,
-                  new MaterialPageRoute(
-                    builder: (BuildContext context) => new CreateScreen(
-                      //isTask: true,
-                      item: Task(),
-                      projectid: widget.projectid.id,
-                    ),
-                    fullscreenDialog: true,
-                  ));
-              setState(() {
-                addTask = result;
-              });
+            onPressed: ()  {
+               goToSecondScreen(Task(), projectid.id);//widget.projectid.id,
+
             },
             tooltip: 'task',
           ), //:Container(),
@@ -134,7 +144,8 @@ class _TaskScreenState extends State<TaskScreen> with TickerProviderStateMixin {
                   valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                 ),
               );
-            } else if (taskList.isEmpty) {
+            }
+            else if (taskList.isEmpty) {
               return Center(
                   child: Column(
                 children: [
@@ -150,18 +161,7 @@ class _TaskScreenState extends State<TaskScreen> with TickerProviderStateMixin {
                 ],
               ));
             } else {
-              print("widget.projectid ${widget.projectid}");
-              String userName=Provider.of<UserModel>(context, listen: false).user.name;
-              Provider.of<ProjectModel>(context, listen: false).userProject.forEach((element) {
-                print(element.id==widget.projectid);
-               // if( element.id ==widget.projectid){
-                  if(element.managerName==userName){
-                 //   setState(() {
-                      isManeger=true;
-                  //  });
-                //  }
-                }
-              });
+
               return bodyTask();
             }
           })),
@@ -171,7 +171,19 @@ class _TaskScreenState extends State<TaskScreen> with TickerProviderStateMixin {
 
   bool proi = false;
   bodyTask() {
-
+    //  print("widget.projectid ${widget.projectid}");
+    String userName=Provider.of<UserModel>(context, listen: false).user.name;
+    Provider.of<ProjectModel>(context, listen: false).userProject.forEach((element) {
+    //  print("id,,, ${element.id }  ${widget.projectid.id}");
+      if( element.id ==projectid.id//widget.projectid.id
+      ){
+        if(element.managerName==userName){
+        //  setState(() {
+            isManeger=true;
+        //  });
+        }
+      }
+    });
     print(" bodyTa  $isManeger");
     return Padding(
         padding: const EdgeInsets.all(12.0),
@@ -184,7 +196,7 @@ class _TaskScreenState extends State<TaskScreen> with TickerProviderStateMixin {
                       key: Key('${taskList[index].taskName}'),
                       child: CartTask(
                         des:taskList[index],
-                        child:TaskNote(note:taskList[index].notes),
+                        child:TaskNote(note:taskList[index].notes==null?[]:taskList[index].notes),
                           click: expandList[index],
                           onTap: () {
                             setState(() {
@@ -194,15 +206,6 @@ class _TaskScreenState extends State<TaskScreen> with TickerProviderStateMixin {
                           },
                         //  proirty:
                           listTile:ListTile(
-                             /* leading: IconButton(
-                                  icon: Icon(proi ? Icons.star : Icons.star_border),
-                                  color: Color(0xffe9a14e),
-                                  onPressed: () {
-                                    setState(() {
-                                      proi = proi ? proi : false;
-                                    });
-                                  }),*/
-                             // dense: true,
                               title: Text( taskList[ index].taskName,
                                   style:
                                   TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
@@ -211,15 +214,13 @@ class _TaskScreenState extends State<TaskScreen> with TickerProviderStateMixin {
                                   style: TextStyle(fontSize: 11)))),
                       background: SlideRightBackgroundWidget(),
                       secondaryBackground:isManeger? SlideLeftWidget(
-                        icon:isManeger// (Provider.of<UserModel>(context).user.isAdmin)
+                            icon:isManeger// (Provider.of<UserModel>(context).user.isAdmin)
                             ? Icons.person_add_outlined
                             : Icons.redo,
-                        title:// isManeger//(Provider.of<UserModel>(context).user.isAdmin)
-                             " Assign to"
-                           // : "Next State",
+                        title:'assign'
                       ):Container(),
                       confirmDismiss: (direction) async {
-                        if (direction == DismissDirection.endToStart) {
+                        if (direction == DismissDirection.endToStart&& isManeger) {
                           final bool res = await showDialog(
                               context: context,
                               builder: (BuildContext context) {
@@ -228,21 +229,14 @@ class _TaskScreenState extends State<TaskScreen> with TickerProviderStateMixin {
                                     index: taskList[index],
                                     dearection: true,
                                     title: Text(
-                                      isManeger
-                                    //  (Provider.of<UserModel>(context,   listen: false) .user .isAdmin)
-                                          ? "You want to assgin ${taskList[index].taskName} task to?"
-                                          : "Log note",
+                                    "You want to assgin ${taskList[index].taskName} task to?",
                                       style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold),
                                     ));
                               });
-                          await Provider.of<TaskModel>(context, listen: false)
-                              .assginTaskTo(
-                                  uid: Provider.of<TaskModel>(context,
-                                          listen: false)
-                                      .uidAssigind,
-                                  tid: taskList[index].taskId);
+
+
                         } else if (direction == DismissDirection.startToEnd) {
                           final bool res = await showDialog(
                               context: context,
@@ -250,10 +244,8 @@ class _TaskScreenState extends State<TaskScreen> with TickerProviderStateMixin {
                                 return AlertDialogPM(
                                     index: taskList[index],
                                     dearection: false,
-                                    title: Text(isManeger
-                                  //   (isManeger|| Provider.of<UserModel>(context,  listen: false) .user .isAdmin)
-                                          ? "Log note"
-                                          : "Replay",
+                                    title: ContentApp(
+                                          code: "reply",
                                       style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold),
@@ -329,8 +321,6 @@ class CartTask extends StatelessWidget {
             )),
         child: Column(
           children: [
-            //  SizedBox(height: 22),
-            //  ListTile(leading :Text('Project name: ', ), title: Text(task.project.toUpperCase(),style: TextStyle(fontWeight: FontWeight.w300, fontSize: 16)),dense: true  ),
             listTile,
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 12),
@@ -338,7 +328,6 @@ class CartTask extends StatelessWidget {
                 child: click?Icon(Icons.keyboard_arrow_up,size: 12, color:Colors.black26): Icon(Icons.keyboard_arrow_down,size: 12, color:Colors.black26),
               ),
             ),
-
             ExpandedSection(
               child: Column(
                 children: [
@@ -354,7 +343,7 @@ class CartTask extends StatelessWidget {
                       des==null?Container():
                           Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: Text(des.description=='false'?'':des.description, style: MyTheme.bodyTextTask),
+                            child: Text(des.description=='false'?'':removeAllHtmlTags(des.description), style: MyTheme.bodyTextTask),
                           ),
                       des==null?Container():  Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -381,10 +370,18 @@ class CartTask extends StatelessWidget {
     );
   }
 }
+String removeAllHtmlTags(String htmlText) {
+  RegExp exp = RegExp(
+      r"<[^>]*>",
+      multiLine: true,
+      caseSensitive: true
+  );
 
+  return htmlText.replaceAll(exp, '');
+}
 ///todo:
 Color taskColor(String a) {
-  List stageList = ['New', 'Assign', 'In Progress', 'Done', 'Canceled'];
+//  List stageList = ['New', 'Assign', 'In Progress', 'Done', 'Canceled'];
   // return Color
 }
 
@@ -397,7 +394,7 @@ List listOftask(String s, sList, tList) {
 }
 
 class TaskNote extends StatelessWidget {
-   List<Note> note=List();
+   List<Note> note=[];
    TaskNote({Key key, this.note}) : super(key: key);
   @override
   Widget build(BuildContext context) {
@@ -437,4 +434,5 @@ class TaskNote extends StatelessWidget {
       ),
     );
   }
+
 }

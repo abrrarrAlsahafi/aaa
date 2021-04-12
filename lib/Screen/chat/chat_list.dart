@@ -32,22 +32,23 @@ class ChatList extends StatefulWidget {
 }
 
 class _ChatListState extends State<ChatList> with TickerProviderStateMixin {
-  List<Chat> chatHestoryList = List();
+  List<Chat> chatHestoryList = [];
   TextEditingController controller = new TextEditingController();
   int newmass;
   Timer timer;
   var items;
 
-  @override
-  Future<void> initState() {
-    newmass =
-        Provider.of<NewMessagesModel>(context, listen: false).newMessages ==
-                null
-            ? 0
-            : Provider.of<NewMessagesModel>(context, listen: false)
-                .newMessages
-                .totalNewMessages;
+@override
+  void initState() {
+    // TODO: implement initState
     super.initState();
+    newmass =
+    Provider.of<NewMessagesModel>(context, listen: false).newMessages ==
+        null
+        ? 0
+        : Provider.of<NewMessagesModel>(context, listen: false)
+        .newMessages
+        .totalNewMessages;
   }
 
 /*
@@ -292,7 +293,7 @@ class _CreateGruopeState extends State<CreateGruope> {
   final _formKey = GlobalKey<FormState>();
   bool _autoValidate = false;
   var groupName;
-  List items = List();
+  List items = [];
 
   @override
   void initState() {
@@ -334,6 +335,7 @@ class _CreateGruopeState extends State<CreateGruope> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: MyTheme.kAccentColor,
       appBar: AppBar(
         title: ContentApp(code: 'new group'),
       ),
@@ -341,7 +343,7 @@ class _CreateGruopeState extends State<CreateGruope> {
         onPressed: () => validateInput(),
         icon: Icons.add,
       ),
-      body: Column(
+      body: ListView(
         children: [
           ListTile(
             dense: true,
@@ -478,7 +480,7 @@ class _ListUsersState extends State<ListUsers> {
   }
 
   List userSelected() {
-    List usersSelected = List();
+    List usersSelected = [];
     for (int i = 0; i < items.length; i++) {
       // print("${isChecked[i]}, $i");
       if (isChecked[i]) {

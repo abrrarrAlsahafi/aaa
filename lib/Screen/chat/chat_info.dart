@@ -8,6 +8,7 @@ import 'package:management_app/widget/content_translate.dart';
 import 'package:management_app/widget/flat_action_botton_wedget.dart';
 import 'package:management_app/Screen/chat/chat_list.dart';
 import 'package:provider/provider.dart';
+import '../../app_theme.dart';
 import '../member_list.dart';
 
 class ChatInfo extends StatefulWidget {
@@ -22,10 +23,10 @@ class ChatInfo extends StatefulWidget {
 }
 
 class _ChatInfoState extends State<ChatInfo> {
-  List<Folowing> members = List();
+  List<Folowing> members = [];
   //List<ListItem> items = List();
   Folowing admin = Folowing();
-
+bool newMember=false;
   @override
   void initState() {
     super.initState();
@@ -42,34 +43,19 @@ class _ChatInfoState extends State<ChatInfo> {
    // print(      Provider.of<ChatModel>(context, listen: false).isChat(widget.channalId));
     return Scaffold(
       backgroundColor: const Color(0xfff3f6fc),
+      appBar: AppBar(elevation: 0),
       body: Container(
+
      //   padding: EdgeInsets.all(MediaQuery.of(context).size.height/22),
         child: Column(
           children: [
             Container(
-              height: MediaQuery.of(context).size.height/2.3,
+              height: MediaQuery.of(context).size.height/3.4,
               width: MediaQuery.of(context).size.width,
               color: hexToColor('#336699'),
               child: Column(
                 children: [
-                 // SizedBox(height: MediaQuery.of(context).size.height/12),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 22,left: 8),
-                    child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: IconButton(
-                          icon: Icon(
-                            Icons.arrow_forward_ios,
-                            color: Colors.white,
-                            size: 18,
-                          ),
-                          onPressed: () => Navigator.of(context).pop(),
-                        )),
-                  ),
-                  Expanded(
-                      child: SizedBox(
-                    height: 12,
-                  )),
+
                   Container(
                     height: 100,
                     width: 100,
@@ -96,20 +82,29 @@ class _ChatInfoState extends State<ChatInfo> {
           ],
         ),
       ),
+
       floatingActionButton:widget.sender.isChat//Provider.of<ChatModel>(context, listen: false).isChat(widget.channalId)
         ?Container() :
       FlatActionButtonWidget(
             onPressed:(){
              // _showModalSheet();             // BottonWidget().
-             mainBottomSheet(context, 'addMember');
-            // setState(() {
-
-            // });
+       mainBottomSheet(context, 'addMember');
+        // print("$b");
+       if(newMember)
+       {
+         Scaffold.of(context).showSnackBar(SnackBar(
+           content: Text("there is new member added to ${widget.sender.name.toString()}",
+             style: MyTheme.Snacbartext,),
+           duration: Duration(seconds: 4),
+           backgroundColor: MyTheme.kUnreadChatBG,));
+       }
             },
             icon: Icons.person_add_alt_1_outlined
       ),
     );
   }
+
+
 
   buildItem(context) {
     var membersid = Provider.of<ChatModel>(context, listen: false).getChannalInformation(widget.channalId);
@@ -128,7 +123,7 @@ class _ChatInfoState extends State<ChatInfo> {
               (i) => MessageItem(
               member[i], false));
       List isChecked = List<bool>.filled(items.length, false);
-      showModalBottomSheet<dynamic>(
+      Future<void> future=   showModalBottomSheet<dynamic>(
           context: context,
           isScrollControlled: true,
           builder: (BuildContext context) {
@@ -198,13 +193,15 @@ class _ChatInfoState extends State<ChatInfo> {
                                         code: '$title',
                                         style:TextStyle(fontSize: 16,color: Colors.white),
                                       ),
-                                      //   icon: Icons.check_circle_rounded,
+                                      // icon: Icons.check_circle_rounded,
                                       onPressed: () async {
                                         List member = userSelected(items, isChecked);
                                         await Provider.of<ChatModel>(context, listen: false).addMember(widget.channalId, member);
                                         Provider.of<ChatModel>(context,listen: false).getChannalInformation(widget.channalId);
-                                        Navigator.of(context).pop();
-                                        buildItem(context);
+
+                                        Navigator.pop(context,newMember);//.pop();
+                                        //buildItem(context);
+
                                       }
                                   ),
                                ),
@@ -214,11 +211,19 @@ class _ChatInfoState extends State<ChatInfo> {
                   );
                 });
           });
-    }
+      future.then((void value) => _closeModal(value));
+  }
+  void _closeModal(void value) {
+    setState(() {
+      newMember=true;
+    });
+
+    print('modal $newMember');
+  }
 
 
   List userSelected(items,isChecked ) {
-    List usersSelected = List();
+    List usersSelected =[];
     for (int i = 0; i < items.length; i++) {
       // print("${isChecked[i]}, $i");
       if (isChecked[i]) {

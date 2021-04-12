@@ -16,12 +16,12 @@ class BottonWidget {
         member.length,
             (i) => MessageItem(
             member[i], false));
-   List isChecked = List<bool>.filled(items.length, false);
+   //List isChecked = List<bool>.filled(items.length, false);
     showModalBottomSheet<dynamic>(
         context: context,
         isScrollControlled: true,
         builder: (BuildContext context) {
-         List list=List();
+
           return Container(
               padding: EdgeInsets.only(
                 top: MediaQuery.of(context).padding.top,

@@ -7,16 +7,17 @@ import 'package:flutter_screenutil/screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:management_app/Screen/chat/chat_list.dart';
 import 'package:management_app/Screen/profile.dart';
+import 'package:management_app/Screen/tasks.dart';
 import 'package:management_app/services/index.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_widgets/responsive_widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'Screen/board.dart';
 import 'Screen/login_page.dart';
 
 import 'bottom_bar.dart';
 import 'generated/I10n.dart';
 import 'model/app_model.dart';
+import 'model/board.dart';
 import 'model/channal.dart';
 import 'model/folowing.dart';
 import 'model/massege.dart';
@@ -35,16 +36,24 @@ var email;
 
 class MyApp extends StatefulWidget {
   final AppModel appLanguage;
-  static void setLocale(BuildContext context, Locale newLocale) async {
+
+   static Locale locale = Locale('en');
+    static void setLocale(BuildContext context, Locale newLocale) async {
     _MyAppState state = context.findAncestorStateOfType<_MyAppState>();
     state.setLocale(newLocale);
+    locale =newLocale;
   }
 
   MyApp({Key key, this.appLanguage}) : super(key: key);
   @override
   _MyAppState createState() => _MyAppState();
-}
 
+  Locale get local{
+    return locale;
+  }
+ /// getLocale()=>locale;
+}
+var projectid;
 class _MyAppState extends State<MyApp> {
   Locale _locale = Locale('en');
 
@@ -94,6 +103,7 @@ bool tap=false;
           ChangeNotifierProvider(create: (context) => MassegesContent()),
           ChangeNotifierProvider(create: (context) => NewMessagesModel()),
           ChangeNotifierProvider(create: (context) => ProjectModel()),
+          ChangeNotifierProvider(create: (context)=> BoardsModel()),
         ],
         child: StreamProvider<User>.value(
             value: Services().user,
@@ -124,7 +134,7 @@ bool tap=false;
                 '/b': (BuildContext context) => LoginPage(),
                 '/d': (BuildContext context) => Profile(),
                 '/chat':(BuildContext context) => ChatList(),
-                //'/project':(BuildContext context) => ChatList(),
+                '/task':(BuildContext context) => TaskScreen(projectid:projectid ),
 
               },
               home:Roots(),

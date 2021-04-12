@@ -9,6 +9,7 @@ import 'package:management_app/widget/bulid_memberimage.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../app_theme.dart';
 import 'chat_message_tile.dart';
 
 class MyDirectChatDetailPage extends StatefulWidget {
@@ -69,6 +70,7 @@ class _MyDirectChatDetailPageState extends State<MyDirectChatDetailPage> {
     }
     return m;
   }
+  DateTime time = DateTime.now();
 
   @override
   void initState() {
@@ -81,13 +83,22 @@ class _MyDirectChatDetailPageState extends State<MyDirectChatDetailPage> {
       createGroup();
       // setState(() {  addnewChat = true;});
     } else {
-      //myMessages = Provider.of<ChatModel>(context, listen: false).chatMasseges( widget.mid);
+     /* Timer(Duration(seconds: -1), () {
+        if (!_disposed) {
+          getMasseges();
+
+        setState(() {
+            time = time.add(Duration(seconds: 1));
+          });
+        }
+      });*/
       getMasseges();
+
+     // print('myMessages $myMessages');
+
+      //myMessages = Provider.of<ChatModel>(context, listen: false).chatMasseges( widget.mid);
+
       timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
-        print('${Provider.of<NewMessagesModel>(context, listen: false)
-            .newMessages
-            .totalNewMessages}');
-        //  if (Provider.of<NewMessagesModel>(context, listen: false).totalm > 0){
         if (Provider.of<NewMessagesModel>(context, listen: false)
                 .newMessages
                 .totalNewMessages >
@@ -104,32 +115,29 @@ class _MyDirectChatDetailPageState extends State<MyDirectChatDetailPage> {
   void dispose() {
     super.dispose();
     timer?.cancel();
+   // myMessages.clear();
+
     _disposed = true;
   }
 
-  getMasseges() {
+  getMasseges() async {
     if (Provider.of<NewMessagesModel>(context, listen: false)
             .newMessages
             .totalNewMessages >
         0) {
       newDirctMassege();
-    } else {
-      myMessages = Provider.of<ChatModel>(context, listen: false)
-          .chatMasseges(widget.mid);
-      //Provider.of<ChatModel>(context).is
+
+    } else if(Provider.of<ChatModel>(context, listen: false)
+        .chatMasseges(widget.mid)==null){
+      myMessages = await Provider.of<MassegesContent>(context, listen: false)
+          .getMassegesContext(widget.mid);
+      setState(() {});
+    }
+    else{
+      myMessages=Provider.of<ChatModel>(context, listen: false)
+        .chatMasseges(widget.mid);
     }
   }
-
-  /*checkForNewsMs() async {
-    await Provider.of<NewMessagesModel>(context,
-        listen: false) //.newMessages
-        .newMessagesList();
-
-    if (Provider.of<NewMessagesModel>(context, listen: false)
-        .totalm > 0) {
-      newDirctMassege();
-    }
-  }*/
 
   newDirctMassege() async {
     myMessages = await Provider.of<MassegesContent>(context, listen: false)
@@ -208,7 +216,7 @@ class _MyDirectChatDetailPageState extends State<MyDirectChatDetailPage> {
         newmasseg = await EmomApi().postNewMessage(widget.mid, message);
       } else {
         myMessages.insert(0, (Massege(message, DateTime.now(), 'Me', true)));
-        print(myMessages.first);
+        //print(myMessages.first);
         newmasseg = await EmomApi().postNewMessage(widget.mid, message);
         // getMasseges();
       }
@@ -226,7 +234,6 @@ class _MyDirectChatDetailPageState extends State<MyDirectChatDetailPage> {
   }
 
   void _scrollToLast() {
-    //  print('object');
     _scrollController.animateTo(
       0.3,
       curve: Curves.easeOut,
@@ -283,7 +290,6 @@ class _MyDirectChatDetailPageState extends State<MyDirectChatDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    //  print(widget.mid);
     return WillPopScope(
       onWillPop: () async => false,
       /* child: Consumer<MassegesContent>(
@@ -297,12 +303,42 @@ class _MyDirectChatDetailPageState extends State<MyDirectChatDetailPage> {
       child: Scaffold(
         backgroundColor: const Color(0xfff3f6fc),
         appBar: _myDetailAppBar(),
-        body: //myMessages==null? Container():
-            buildBody(),
-      ),
-      //  ),
-    );
+        body:  FutureBuilder<void>(builder: (BuildContext context, snapshot) {
+          if (snapshot.hasData ||   myMessages== null) {
+             print('myMessages }');
+            return Center(
+              child: CircularProgressIndicator(
+                backgroundColor: Color(0xff336699),
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              ),
+            );
+          }
+         /* else{if (myMessages.isEmpty) {
+            return Center(
+                child: Column(
+                  children: [
+                    SizedBox(height: 50),
+                    Icon(Icons.playlist_add,
+                        size: MediaQuery.of(context).size.width / 2,
+                        color: Colors.grey[300]),
+                    SizedBox(height: 50),
+                    ContentApp(
+                      code: 'noTask',
+                      style: MyTheme.bodyTextTask,
+                    ),
+                  ],
+                ));
+          }*/ else {
+            return buildBody();
+          }
+        })
+
+      )
+      );
+//    buildBody()));
   }
+
+
 
   @override
   Widget _myDetailAppBar() {
@@ -337,11 +373,11 @@ class _MyDirectChatDetailPageState extends State<MyDirectChatDetailPage> {
         children: [
           widget.title == null
               ? Expanded(
-                child: Text(widget.chatDetils.name,// style: MyTheme.kAppTitle
+                child: Text(widget.chatDetils.name,style: MyTheme.kAppTitle
           ),
               )
               : Expanded(
-                  child: Text('${widget.title}', //style: MyTheme.kAppTitle
+                  child: Text('${widget.title}', style: MyTheme.kAppTitle
                   ))
           //TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold))),
         ],

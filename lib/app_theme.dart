@@ -16,7 +16,7 @@ class MyTheme {
   static final TextStyle kAppTitle = GoogleFonts.tajawal(
       fontSize: ScreenUtil().setSp(20, allowFontScalingSelf: true),
       fontWeight: FontWeight.bold,
-      color:Color(0xff336699) );
+      color:Colors.white );
   static final TextStyle heading2 = TextStyle(
     color: Colors.black,
     fontSize: ScreenUtil().setSp(16, allowFontScalingSelf: true),

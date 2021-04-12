@@ -12,23 +12,27 @@ class SlideRightBackgroundWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(8.0),
         color: MyTheme.kPrimaryColorVariant,
       ),
-      child: Align(
-          child: Column(
+      child:// Align(
+         // child:
+      Column(crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               SizedBox(width: 10),
               Icon(Icons.reply, color: Colors.white),
               SizedBox(width: 10),
               ContentApp(code:'reply' ,
+
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w700,
                   ),
-                 align: TextAlign.left
+                 //align: TextAlign
               ),
             ],
           ),
-          alignment: Alignment.centerLeft),
+         // alignment: MyApp().local == Locale('en')?
+        //   Alignment.centerLeft:
+        //  Alignment.centerRight),
     );
   }
 }

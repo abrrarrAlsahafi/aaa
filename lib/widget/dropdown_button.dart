@@ -35,7 +35,7 @@ class CustomDropDown extends StatelessWidget {
                 style: TextStyle(fontSize: 20),
                 overflow: TextOverflow.ellipsis,
               ),
-              style: Theme.of(context).textTheme.title,
+              style: Theme.of(context).textTheme.bodyText1,
               items: items,
               onChanged: (item) {
                 onChanged(item);

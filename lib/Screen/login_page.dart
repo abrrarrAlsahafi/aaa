@@ -12,7 +12,6 @@ import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../bottom_bar.dart';
-import '../main.dart';
 
 class LoginPage extends StatefulWidget {
   LoginPage({
@@ -239,7 +238,7 @@ class _LoginPageState extends State<LoginPage> {
       _formKey.currentState.save();
       dynamic result =
           await EmomApi().login(username: model.username, password: model.pass);
-      print('${result}');
+      //print('ttt ${result.pass}');
       if (result.runtimeType != User) {
         if(result.toString().contains('Failed host')){
           setState(() {
@@ -255,14 +254,13 @@ class _LoginPageState extends State<LoginPage> {
         });}
       } else {
         UserModel userModel = Provider.of<UserModel>(context, listen: false);
+        result.pass=model.pass;
         userModel.saveUser(result);
         setState(() {
           isLoggedIn = true;
         });
-
+        AppModel().config(context);
         Navigator.of(context).pushNamed('/a');
-
-        //  Navigator.push(context, new MaterialPageRoute(builder: (context) => BottomBar()));
         if (_isSelected) {
           saveEmail(model);
           SharedPreferences prefs = await SharedPreferences.getInstance();

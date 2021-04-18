@@ -34,8 +34,12 @@ class _MeetingsScreenState extends State<MeetingsScreen> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () async => false,
-      child: Scaffold(
+      onWillPop: ()  async {
+      Navigator.pop(context);
+      return true;
+    },
+      child:
+      Scaffold(
           backgroundColor: MyTheme.kAccentColor,
           appBar: AppBar(
               backgroundColor: MyTheme.kPrimaryColorVariant,

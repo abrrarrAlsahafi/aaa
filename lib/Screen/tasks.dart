@@ -116,8 +116,12 @@ class _TaskScreenState extends State<TaskScreen> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
 
     return  WillPopScope(
-      onWillPop: () async => false,
-      child: Scaffold(
+      onWillPop: () async {
+        Navigator.pop(context, addTask);
+        return addTask;
+      },//=>addTask, //
+      child:
+      Scaffold(
           appBar: AppBar(
             backgroundColor: MyTheme.kPrimaryColorVariant,
             leading: Container(

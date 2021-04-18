@@ -36,7 +36,7 @@ class _ChatListState extends State<ChatList> with TickerProviderStateMixin {
   TextEditingController controller = new TextEditingController();
   int newmass;
   Timer timer;
-  var items;
+  List items;
 
 @override
   void initState() {
@@ -140,7 +140,7 @@ class _ChatListState extends State<ChatList> with TickerProviderStateMixin {
                         // Convert each item into a widget based on the type of item it is.
                         itemBuilder: (context, index) {
                           final item = _searchResult.length != 0 ||
-                                  controller.text.isNotEmpty
+                              controller.text.isNotEmpty
                               ? _searchResult[index]
                               : items[index];
                           return Stack(children: [
@@ -186,8 +186,8 @@ class _ChatListState extends State<ChatList> with TickerProviderStateMixin {
                                       )
                                     : Container()
                                 : Container()
-                          ]);
-                        },
+                          ]);}
+
                       )),
                 ),
               ]));

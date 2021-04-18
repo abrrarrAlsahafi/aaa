@@ -14,7 +14,7 @@ abstract class BaseServices {
     password,
   });
 
-  Future<dynamic> login({username, password});
+  Future<dynamic> login(context,{username, password});
   Future<void> logOut({username, password});
   Future<dynamic> chatHistory();
   Future<List<Folowing>> getfollowingList();
@@ -51,8 +51,8 @@ class Services implements BaseServices {
   }
 
   @override
-  Future<dynamic> login({username, password}) {
-    throw serviceApi.login();
+  Future<dynamic> login(context,{username, password}) {
+    throw serviceApi.login(context);
   }
 
   @override

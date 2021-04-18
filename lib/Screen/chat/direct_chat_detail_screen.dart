@@ -291,7 +291,7 @@ class _MyDirectChatDetailPageState extends State<MyDirectChatDetailPage> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () async => false,
+      onWillPop: () async => _onBackPressed(),
       /* child: Consumer<MassegesContent>(
           builder: (context,directMassege,child)  {
             //print(directMassege.massegesContent);
@@ -396,11 +396,10 @@ class _MyDirectChatDetailPageState extends State<MyDirectChatDetailPage> {
     );
   }
 
+
   buildBody() {
      print("new chat ${widget.newChat}");
-    return WillPopScope(
-      onWillPop: () async => widget.newChat?false:true,//false,
-      child: GestureDetector(
+    return GestureDetector(
         onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
         child: Container(
           child: Column(
@@ -428,7 +427,11 @@ class _MyDirectChatDetailPageState extends State<MyDirectChatDetailPage> {
             ],
           ),
         ),
-      ),
     );
+  }
+
+  _onBackPressed() {
+    if(widget.newChat) Navigator.pushReplacementNamed(context, "/a");
+    else Navigator.pushReplacementNamed(context, "/a");
   }
 }

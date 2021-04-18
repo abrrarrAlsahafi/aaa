@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:management_app/Screen/chat/chat_list.dart';
 import 'package:management_app/Screen/profile.dart';
 import 'package:management_app/Screen/tasks.dart';
+import 'package:management_app/services/emom_api.dart';
 import 'package:management_app/services/index.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_widgets/responsive_widgets.dart';
@@ -25,10 +26,10 @@ import 'model/task.dart';
 import 'model/user.dart';
 
 void main() async {
+
   WidgetsFlutterBinding.ensureInitialized();
   AppModel appLanguage = AppModel();
-  runApp(
-      MyApp(appLanguage: appLanguage));
+  runApp(  MyApp(appLanguage: appLanguage));
 }
 
 var email;
@@ -76,7 +77,7 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     // TODO: implement initState
     super.initState();
-   // cheackIsLoggedIn();
+//   cheackIsLoggedIn();
   }
 bool tap=false;
   @override
@@ -152,13 +153,42 @@ bool tap=false;
   }
 
   rootMangmentApp() {}
-  cheackIsLoggedIn() async {
-    SharedPreferences localStorage = await SharedPreferences.getInstance();
-    isLoggedIn = localStorage.get("isLoggedIn")==null? false: localStorage.get("isLoggedIn");
-  }
+
 }
 
-class Roots extends StatelessWidget {
+class Roots extends StatefulWidget {
+
+  @override
+  _RootsState createState() => _RootsState();
+}
+class _RootsState extends State<Roots> {
+  bool isLoggedIn;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    Future.delayed(const Duration(milliseconds: 500), () {
+      cheackIsLoggedIn();
+    });
+  }
+  cheackIsLoggedIn() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var status = prefs.getBool('isLoggedIn') ?? false;
+
+    print("$status ${prefs.getString('email')} ${prefs.getString('pass')}");
+    if(status) {
+      User user= await EmomApi().login(context,username: prefs.getString('email'), password:prefs.getString('pass'));
+      Provider.of<UserModel>(context,listen: false).saveUser(user);
+      AppModel().config(context);
+    }
+setState(() {
+  isLoggedIn=status;
+});
+    //
+    //SharedPreferences localStorage = await SharedPreferences.getInstance();
+    // isLoggedIn = localStorage.get("isLoggedIn")==null? false: localStorage.get("isLoggedIn");
+  }
+
   @override
   Widget build(BuildContext context) {
     ScreenUtil.init(context,
@@ -175,8 +205,29 @@ class Roots extends StatelessWidget {
     return ResponsiveWidgets.builder(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
-        child: isLoggedIn ? BottomBar() :
-        LoginPage()); //auth login
+        // isLoggedIn ? BottomBar() :
+    //         LoginPage()
+        child: FutureBuilder<void>(builder: (BuildContext context, snapshot) {
+        if ( isLoggedIn == null) {
+          // print('taskList  ${taskList}');
+          return Scaffold(
+            appBar: AppBar(),
+            backgroundColor: Color(0xfff3f6fc),
+            body: Center(
+              child: CircularProgressIndicator(
+                backgroundColor: Color(0xff336699),
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              ),
+            ),
+          );
+        }
+        else if(isLoggedIn){
+          return BottomBar();
+        } else {
+          return LoginPage();
+    }
+    }
+        )); //auth login
   }
 }
 

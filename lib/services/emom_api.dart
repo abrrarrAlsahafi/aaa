@@ -10,6 +10,7 @@ import 'package:management_app/model/sessions.dart';
 import 'package:management_app/model/task.dart';
 import 'package:management_app/model/user.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -66,7 +67,7 @@ class EmomApi implements BaseServices {
       if (response.statusCode == 200) {
         // var body = convert.jsonDecode(response.body);
         // print('code response : ${response.statusCode}, $body');
-        return await this.login(username: email, password: password);
+        return null;
       } else {
         final body = convert.jsonDecode(response.body);
         List error = body["messages"];
@@ -81,6 +82,7 @@ class EmomApi implements BaseServices {
       rethrow;
     }
   }
+
 
   @override
   Future<void> logOut({username, password}) async {
@@ -114,7 +116,7 @@ class EmomApi implements BaseServices {
   }
 
   @override
-  Future<dynamic> login({username, password}) async {
+  Future<dynamic> login(context,{username, password}) async {
     connect();
     // print(_client);
     try {
@@ -137,8 +139,11 @@ class EmomApi implements BaseServices {
         localStorage.setInt('uid', body['result']['uid']);
         localStorage?.setBool("isLoggedIn", true);
         // print(response.body);
+       // prefs?.setBool("isLoggedIn", true);
+      //  User user
+        //Provider.of<UserModel>(context,listen: false).saveUser(user);
 
-        return User.fromJson(body['result']);
+        return User.fromJson(body['result']);;
       } else {
         final body = convert.jsonDecode(response.body);
         return Exception(body["message"] =

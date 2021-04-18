@@ -237,7 +237,7 @@ class _LoginPageState extends State<LoginPage> {
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
       dynamic result =
-          await EmomApi().login(username: model.username, password: model.pass);
+          await EmomApi().login(context,username: model.username, password: model.pass);
       //print('ttt ${result.pass}');
       if (result.runtimeType != User) {
         if(result.toString().contains('Failed host')){
@@ -256,9 +256,7 @@ class _LoginPageState extends State<LoginPage> {
         UserModel userModel = Provider.of<UserModel>(context, listen: false);
         result.pass=model.pass;
         userModel.saveUser(result);
-        setState(() {
-          isLoggedIn = true;
-        });
+       // setState(() {   isLoggedIn = true;  });
         AppModel().config(context);
         Navigator.of(context).pushNamed('/a');
         if (_isSelected) {

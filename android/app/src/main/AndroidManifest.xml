@@ -12,7 +12,7 @@
     <application
 
         android:name="io.flutter.app.FlutterApplication"
-        android:label="management_app"
+        android:label="AON"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

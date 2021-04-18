@@ -85,6 +85,8 @@ class _ProfileState extends State<Profile> {
             .of<UserModel>(context, listen: false)
             .user
             .pass);
+          Provider .of<UserModel>(context, listen: false).logout();
+
           await EmomApi().logOut(
             username: Provider
                 .of<UserModel>(context, listen: false)
@@ -97,12 +99,10 @@ class _ProfileState extends State<Profile> {
           );
 
         setState(() {
-          isLoggedIn=false;
           Navigator.of(context).pushNamed('/b');
 
         });
         }
-
       )]
       ,
       title: Text('${Provider.of<UserModel>(context,listen: false).user.partnerDisplayName}',

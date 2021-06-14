@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:management_app/common/constant.dart';
 import 'package:management_app/model/channal.dart';
 import 'package:management_app/model/folowing.dart';
+import 'package:management_app/model/user.dart';
 import 'package:management_app/widget/bulid_memberimage.dart';
 import 'package:management_app/widget/buttom_widget.dart';
 import 'package:management_app/widget/content_translate.dart';
@@ -26,12 +27,12 @@ class _ChatInfoState extends State<ChatInfo> {
   List<Folowing> members = [];
   //List<ListItem> items = List();
   Folowing admin = Folowing();
-bool newMember=false;
+  bool newMember=false;
   @override
   void initState() {
     super.initState();
     if (widget.channalId == null) {
-         print("is chat ${widget.sender.isChat}");
+      print("is chat ${widget.sender.isChat}");
     } else {
       buildItem(context);
     }
@@ -40,13 +41,12 @@ bool newMember=false;
 
   @override
   Widget build(BuildContext context) {
-   // print(      Provider.of<ChatModel>(context, listen: false).isChat(widget.channalId));
+    // print(      Provider.of<ChatModel>(context, listen: false).isChat(widget.channalId));
     return Scaffold(
       backgroundColor: const Color(0xfff3f6fc),
       appBar: AppBar(elevation: 0),
       body: Container(
 
-     //   padding: EdgeInsets.all(MediaQuery.of(context).size.height/22),
         child: Column(
           children: [
             Container(
@@ -70,7 +70,7 @@ bool newMember=false;
                     alignment: Alignment.bottomCenter,
                     child: Text(
                       widget.sender.name.toString(),
-                      style: TextStyle(fontSize: 33, color: Colors.white),
+                      style: TextStyle(fontSize: 22, color: Colors.white),
                     ),
                   ),
                 ],
@@ -83,23 +83,22 @@ bool newMember=false;
         ),
       ),
 
-      floatingActionButton:widget.sender.isChat//Provider.of<ChatModel>(context, listen: false).isChat(widget.channalId)
-        ?Container() :
+      floatingActionButton:widget.sender.isChat&& widget.sender.adminId==Provider.of<UserModel>(context, listen: false).user.uid?Container() :
       FlatActionButtonWidget(
-            onPressed:(){
-             // _showModalSheet();             // BottonWidget().
-       mainBottomSheet(context, 'addMember');
-        // print("$b");
-       if(newMember)
-       {
-         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-           content: Text("there is new member added to ${widget.sender.name.toString()}",
-             style: MyTheme.Snacbartext,),
-           duration: Duration(seconds: 4),
-           backgroundColor: MyTheme.kUnreadChatBG,));
-       }
-            },
-            icon: Icons.person_add_alt_1_outlined
+          onPressed:(){
+            // _showModalSheet();             // BottonWidget().
+            mainBottomSheet(context, 'addMember');
+            // print("$b");
+            if(newMember)
+            {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text("there is new member added to ${widget.sender.name.toString()}",
+                  style: MyTheme.Snacbartext,),
+                duration: Duration(seconds: 4),
+                backgroundColor: MyTheme.kUnreadChatBG,));
+            }
+          },
+          icon: Icons.person_add_alt_1_outlined
       ),
     );
   }
@@ -109,109 +108,109 @@ bool newMember=false;
   buildItem(context) {
     var membersid = Provider.of<ChatModel>(context, listen: false).getChannalInformation(widget.channalId);
     //.getChatInfo(widget.channalId,context);
-       // widget.sender.members != null ? widget.sender.members : widget.sender;
+    // widget.sender.members != null ? widget.sender.members : widget.sender;
     members = Provider.of<FollowingModel>(context, listen: false)
         .getMembersChat(membersid, widget.sender.adminId);
 
   }
 
   void mainBottomSheet(BuildContext context, String title) {
-      List member = Provider.of<FollowingModel>(context, listen: false).followList;
-      // isChckList = true;
-      List items = List.generate(
-          member.length,
-              (i) => MessageItem(
-              member[i], false));
-      List isChecked = List<bool>.filled(items.length, false);
-      Future<void> future=   showModalBottomSheet<dynamic>(
-          context: context,
-          isScrollControlled: true,
-          builder: (BuildContext context) {
-            return StatefulBuilder(
-                builder: (BuildContext context, StateSetter state) {
-                  return SingleChildScrollView(
-                    child: LimitedBox(
-                      maxHeight:MediaQuery.of(context).size.height-30,
-                      child: Container(
-                          padding: EdgeInsets.only(
-                            top: MediaQuery
-                                .of(context)
-                                .padding
-                                .top,
+    List member = Provider.of<FollowingModel>(context, listen: false).followList;
+    // isChckList = true;
+    List items = List.generate(
+        member.length,
+            (i) => MessageItem(
+            member[i], false));
+    List isChecked = List<bool>.filled(items.length, false);
+    Future<void> future=   showModalBottomSheet<dynamic>(
+        context: context,
+        isScrollControlled: true,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+              builder: (BuildContext context, StateSetter state) {
+                return SingleChildScrollView(
+                  child: LimitedBox(
+                    maxHeight:MediaQuery.of(context).size.height-30,
+                    child: Container(
+                        padding: EdgeInsets.only(
+                          top: MediaQuery
+                              .of(context)
+                              .padding
+                              .top,
+                        ),
+                        margin: EdgeInsets.only(top: 100),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(12),
+                            topRight: Radius.circular(12),
                           ),
-                          margin: EdgeInsets.only(top: 100),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(12),
-                              topRight: Radius.circular(12),
-                            ),
-                          ),
-                          child: Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    right: 200, top: 12),
-                                child: ContentApp(
+                        ),
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  right: 200, top: 12),
+                              child: ContentApp(
                                   code: '$title',
                                   style: TextStyle(fontSize: 22 , color: Colors.black26)),
-                              ),
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: //isList?
-                                  //  MembersList():
-                                  ListView.builder(
-                                      itemCount: items.length,
-                                      itemBuilder: (BuildContext context,
-                                          int index) {
-                                        final item = items[index];
-                                        return CheckboxListTile(
-                                          value: isChecked[index],
-                                          onChanged: (bool val) {
-                                            state(() {
-                                              isChecked[index] = val;
-                                            });
-                                          },
-                                          title: ListTile(
-                                            dense: true,
-                                            leading: item.buildLeading(  context),
-                                            title: item.buildTitle(
-                                                context ),
-                                            subtitle: item.buildSubtitle(
-                                                context),
-                                          ),
-                                        );
-                                      }
-                                  ),
+                            ),
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: //isList?
+                                //  MembersList():
+                                ListView.builder(
+                                    itemCount: items.length,
+                                    itemBuilder: (BuildContext context,
+                                        int index) {
+                                      final item = items[index];
+                                      return CheckboxListTile(
+                                        value: isChecked[index],
+                                        onChanged: (bool val) {
+                                          state(() {
+                                            isChecked[index] = val;
+                                          });
+                                        },
+                                        title: ListTile(
+                                          dense: true,
+                                          leading: item.buildLeading(  context),
+                                          title: item.buildTitle(
+                                              context ),
+                                          subtitle: item.buildSubtitle(
+                                              context),
+                                        ),
+                                      );
+                                    }
                                 ),
                               ),
-                               Padding(
-                                 padding: EdgeInsets.symmetric(horizontal: 22),
-                                 child: ButtonWidget(
-                                      child: ContentApp(
-                                        code: '$title',
-                                        style:TextStyle(fontSize: 16,color: Colors.white),
-                                      ),
-                                      // icon: Icons.check_circle_rounded,
-                                      onPressed: () async {
-                                        List member = userSelected(items, isChecked);
-                                        await Provider.of<ChatModel>(context, listen: false).addMember(widget.channalId, member);
-                                        Provider.of<ChatModel>(context,listen: false).getChannalInformation(widget.channalId);
-
-                                        Navigator.pop(context,newMember);//.pop();
-                                        //buildItem(context);
-
-                                      }
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 22),
+                              child: ButtonWidget(
+                                  child: ContentApp(
+                                    code: '$title',
+                                    style:TextStyle(fontSize: 16,color: Colors.white),
                                   ),
-                               ),
-                            ],
-                          )),
-                    ),
-                  );
-                });
-          });
-      future.then((void value) => _closeModal(value));
+                                  // icon: Icons.check_circle_rounded,
+                                  onPressed: () async {
+                                    List member = userSelected(items, isChecked);
+                                    await Provider.of<ChatModel>(context, listen: false).addMember(widget.channalId, member);
+                                    Provider.of<ChatModel>(context,listen: false).getChannalInformation(widget.channalId);
+
+                                    Navigator.pop(context,newMember);//.pop();
+                                    //buildItem(context);
+
+                                  }
+                              ),
+                            ),
+                          ],
+                        )),
+                  ),
+                );
+              });
+        });
+    future.then((void value) => _closeModal(value));
   }
   void _closeModal(void value) {
     setState(() {

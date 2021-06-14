@@ -116,7 +116,7 @@ bool tap=false;
               ],
 
               debugShowCheckedModeBanner: false,
-              title: 'EMoM',
+              title: 'EWADY',
              // darkTheme: ThemeData.dark(),
               theme: ThemeData(
                   textTheme:
@@ -132,7 +132,6 @@ bool tap=false;
                 '/d': (BuildContext context) => Profile(),
                 '/chat':(BuildContext context) => ChatList(),
                 '/task':(BuildContext context) => TaskScreen(projectid:projectid ),
-
               },
               home:Roots(),
               localeResolutionCallback: (locale, supportedLocales) {
@@ -174,17 +173,17 @@ class _RootsState extends State<Roots> {
   cheackIsLoggedIn() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var status = prefs.getBool('isLoggedIn') ?? false;
-
     print("$status ${prefs.getString('email')} ${prefs.getString('pass')}");
     if(status) {
-      User user= await EmomApi().login(context,username: prefs.getString('email'), password:prefs.getString('pass'));
+      User user= await EmomApi().login(context,username: prefs.getString('email'),
+          password:prefs.getString('pass'));
       Provider.of<UserModel>(context,listen: false).saveUser(user);
       AppModel().config(context);
     }
 setState(() {
   isLoggedIn=status;
 });
-    //
+
     //SharedPreferences localStorage = await SharedPreferences.getInstance();
     // isLoggedIn = localStorage.get("isLoggedIn")==null? false: localStorage.get("isLoggedIn");
   }

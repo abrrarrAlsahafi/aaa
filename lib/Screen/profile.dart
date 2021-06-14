@@ -8,8 +8,10 @@ import 'package:management_app/services/emom_api.dart';
 import 'package:management_app/widget/content_translate.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../bottom_bar.dart';
 import '../main.dart';
+import 'login_page.dart';
 
 class Profile extends StatefulWidget {
   Profile({Key key}) : super(key: key);
@@ -21,9 +23,7 @@ class Profile extends StatefulWidget {
 class _ProfileState extends State<Profile> {
   bool isChecked = false;
   bool status = false;
-  bool status1 = false;
-  bool status2 = false;
-  bool status3 = false;
+  bool isLogout=false;
   bool _disposed = false;
   Geolocator geolocator = Geolocator();
   String _latitude = "24.7348936";
@@ -67,10 +67,10 @@ class _ProfileState extends State<Profile> {
 
   @override
   Widget build(BuildContext context) {
-    return profileApp();
+    return profileApp(context);
   }
 
-  profileApp() {
+  profileApp(context) {
     return Scaffold(
       appBar: AppBar(
         actions: [
@@ -80,36 +80,35 @@ class _ProfileState extends State<Profile> {
         color: Colors.white,
         size: 18,
       ),
-        onPressed: () async {
-        print(Provider
-            .of<UserModel>(context, listen: false)
-            .user
-            .pass);
-          Provider .of<UserModel>(context, listen: false).logout();
+        onPressed: ()  {
 
-          await EmomApi().logOut(
-            username: Provider
-                .of<UserModel>(context, listen: false)
-                .user
-                .username,
-            password: Provider
-                .of<UserModel>(context, listen: false)
-                .user
-                .pass,
-          );
-
-        setState(() {
+setState(() {
+  isLogout=true;
+});
+          //
+        //  SharedPreferences prefs = await SharedPreferences.getInstance();
+        //  await prefs.setBool('remember', false);
+        //  Navigator.of(context).pushNamed('/');
+          Navigator.push(context, MaterialPageRoute(builder: (context) => Roots()));
+          Provider.of<UserModel>(context, listen: false).logout(context);
+         //
+/*
+          setState(() {
           Navigator.of(context).pushNamed('/b');
 
-        });
+        });*/
         }
-      )]
-      ,
-      title: Text('${Provider.of<UserModel>(context,listen: false).user.partnerDisplayName}',
+      )],
+      title: isLogout?Center(
+        child: CircularProgressIndicator(
+          backgroundColor: Color(0xff336699),
+          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+        ),
+      ): Text('${Provider.of<UserModel>(context,listen: false).user.partnerDisplayName}',
           style: MyTheme.kAppTitle
     )),
       backgroundColor: MyTheme.kAccentColor,
-        body: Container(
+        body:  Container(
       margin: EdgeInsets.all(12),
       height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
@@ -226,7 +225,7 @@ class _ProfileState extends State<Profile> {
 
   employeeInfo() {
     return Padding(
-      padding: EdgeInsets.all(MediaQuery.of(context).size.width / 12),
+      padding: EdgeInsets.all(MediaQuery.of(context).size.width / 22),
       child: Column(
         children: [
           Row(
@@ -236,7 +235,12 @@ class _ProfileState extends State<Profile> {
                   code: 'uid', //'Company Id:',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w200, color: Colors.grey)),
               Expanded(child: SizedBox(height: 10)),
-              Text("${Provider.of<UserModel>(context).user.uid}",
+              isLogout?Center(
+                child: CircularProgressIndicator(
+                  backgroundColor: Color(0xff336699),
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              ): Text("${Provider.of<UserModel>(context).user.uid}",
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             ],
           ),
@@ -291,7 +295,7 @@ class _ProfileState extends State<Profile> {
           ]),
          // SizedBox(height: 10),
           Divider(color: Colors.grey),
-          SizedBox(height: 10),
+          SizedBox(height: MediaQuery.of(context).size.height/55),
 
           // SizedBox(height: MediaQuery.of(context).size.width / 6),
           ContentApp(
@@ -300,19 +304,24 @@ class _ProfileState extends State<Profile> {
                   color: Colors.grey[400],
                   fontWeight: FontWeight.bold,
                   fontSize: 14)),
-          SizedBox(height: 10),
+          SizedBox(height: MediaQuery.of(context).size.height/44),
 
           Container(
               padding: EdgeInsets.only(left: 5),
-              height: MediaQuery.of(context).size.width / 1.6,
-              width: MediaQuery.of(context).size.width / 1.5,
+              height: MediaQuery.of(context).size.width / 1.9,
+              width: MediaQuery.of(context).size.width / 1.6,
               decoration: BoxDecoration(
                   color: Colors.white,
                   border: Border.all(
                     color: Color(0xffe9a14e),
                   ),
                   borderRadius: BorderRadius.all(Radius.circular(22))),
-              child: Center(
+              child:isLogout?Center(
+                child: CircularProgressIndicator(
+                  backgroundColor: Color(0xff336699),
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              ):Center(
                 child: _isGettingLocation == null
                     ? Expanded(
                       child: ContentApp(
@@ -338,8 +347,25 @@ class _ProfileState extends State<Profile> {
                                   fontSize: 12)),
                         ),
               )),
-          //  ),
-          SizedBox(height: 20),
+          SizedBox(height: MediaQuery.of(context).size.height/44),
+          Divider(color: Colors.grey),
+          SizedBox(height: MediaQuery.of(context).size.height/44),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+             Image.asset('assets/Logowithtext.png',
+             height: MediaQuery.of(context).size.height/15,
+             ),
+              SizedBox(width: 22),Image.asset('assets/logo.png',height: MediaQuery.of(context).size.height/15),
+              Text("EWADY",
+                  style: TextStyle(fontSize: MediaQuery.of(context).size.height/44, fontWeight: FontWeight.bold,color: MyTheme.kUnreadChatBG)),
+           ],
+          ),
+          Text("V 1.0.0",
+              style: TextStyle(fontSize: MediaQuery.of(context).size.height/44,
+                  fontWeight: FontWeight.bold, color: Colors.grey)),
+
         ],
       ),
     );

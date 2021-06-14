@@ -11,11 +11,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../bottom_bar.dart';
 
 class LoginPage extends StatefulWidget {
+  final logout;
   LoginPage({
-    Key key,
+    Key key, this.logout,
   }) : super(key: key);
 
   @override
@@ -41,13 +41,19 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void initState() {
-    timer =Timer.periodic(Duration(seconds: 5), (Timer t) {
-    setState(() {
-      isoffline=false;
-    });
-    });
-    rememberMe();
-    super.initState();
+   // if(widget.logout){
+     // print('logout..');
+      //removedata();
+    //}
+  // else {
+      timer = Timer.periodic(Duration(seconds: 5), (Timer t) {
+        setState(() {
+          isoffline = false;
+        });
+      });
+      rememberMe();
+      super.initState();
+   // }
   }
   @override
   void dispose() {
@@ -253,6 +259,7 @@ class _LoginPageState extends State<LoginPage> {
               .loginValidatin; //'The password or username is incorrect';
         });}
       } else {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
         UserModel userModel = Provider.of<UserModel>(context, listen: false);
         result.pass=model.pass;
         userModel.saveUser(result);
@@ -261,8 +268,9 @@ class _LoginPageState extends State<LoginPage> {
         Navigator.of(context).pushNamed('/a');
         if (_isSelected) {
           saveEmail(model);
-          SharedPreferences prefs = await SharedPreferences.getInstance();
           prefs.setBool('remember', true);
+        }else{
+          prefs.setBool('remember', false);
         }
       }
     }
@@ -312,7 +320,8 @@ class _LoginPageState extends State<LoginPage> {
 
   rememberMe() async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
-   if(prefs.getBool('remember')==null?false:prefs.getBool('remember')){
+   bool remember= prefs.getBool('remember')==null?false:prefs.getBool('remember');
+   if(remember){
      model.username= prefs.get('email');
      model.pass= prefs.get('pass');
      emailController=TextEditingController()..text = model.username;
@@ -321,8 +330,16 @@ class _LoginPageState extends State<LoginPage> {
      setState((){});
 
    }
+   else{
+     prefs.clear();
+   }
 //print(model.username);
   // return prefs.getBool('remember');
+  }
+
+  Future<void> removedata() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+//prefs.
   }
 
 }

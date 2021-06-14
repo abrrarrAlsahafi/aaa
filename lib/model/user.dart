@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:localstorage/localstorage.dart';
 import 'package:management_app/common/constant.dart';
+import 'package:management_app/services/emom_api.dart';
 import 'package:management_app/services/index.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -99,25 +100,34 @@ class UserModel with ChangeNotifier {
     }
   }
 
-  Future<void> logout() async {
+  Future<void> logout(context) async {
+
+
     user = null;
     loggedIn = false;
 
-    final LocalStorage storage = LocalStorage("emomApp");
+   // final LocalStorage storage = LocalStorage("emomApp");
     try {
-      final ready = await storage.ready;
-      if (ready) {
-        await storage.deleteItem(kLocalKey["userInfo"]);
-        await storage.deleteItem(kLocalKey["shippingAddress"]);
-        await storage.deleteItem(kLocalKey["recentSearches"]);
-        await storage.deleteItem(kLocalKey["wishlist"]);
-        await storage.deleteItem('token');
+    //  final ready = await storage.ready;
+      //if (ready) {
+       // await storage.deleteItem(kLocalKey["userInfo"]);
+       // await storage.deleteItem(kLocalKey["shippingAddress"]);
+        //await storage.deleteItem(kLocalKey["recentSearches"]);
+       // await storage.deleteItem(kLocalKey["wishlist"]);
+        //await storage.deleteItem('token');
 
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.remove('token');
-        await prefs.setBool('loggedIn', false);
+        await prefs.setBool('isLoggedIn', false);
+        await prefs.setBool('remember', false);
+        await prefs.remove('email');
+        await prefs.remove('pass');
         await prefs.clear();
-      }
+     // }
+      await EmomApi().logOut(
+        username: user.username,
+        password: user.pass,
+      );
     } catch (err) {
       print(err);
     }
